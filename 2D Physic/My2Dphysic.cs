@@ -111,9 +111,9 @@ public class My2Dphysic : MonoBehaviour
                 //反作用力 f=ma
                 float anitiForce = Mathf.Lerp(-velocity.y * mass / forceDrag, 0, Time.deltaTime); //TODO{}現在只會往上彈
                 //if (anitiForce * 0.5f > gravity)
-                if (anitiForce /mass > gravity)
+                if (anitiForce / mass > gravity)
                 {
-                    AddForce(-velocity.normalized * (anitiForce /mass - gravity));
+                    AddForce(-velocity.normalized * (anitiForce / mass - gravity));
                 }
                 velocity.y = 0;
             }
@@ -123,7 +123,8 @@ public class My2Dphysic : MonoBehaviour
             if (hit_in_ground.collider != null)
             {
                 transform.position = new Vector2(transform.position.x, hit_in_ground.point.y + pull_from_ground_radious * 2);//?NOTE:加的值太大會抖
-                force.y = Mathf.Clamp(force.y, 0, force.y);
+                if (force.y < 0) { force.y = 0; }
+                //force.y = Mathf.Clamp(force.y, 0, force.y);
             }
         }
 
@@ -157,7 +158,6 @@ public class My2Dphysic : MonoBehaviour
     //檢查碰牆
     void Wall_block()
     {
-
         //向移動的方向射ray，若ray打到牆壁則依面向的方向限制x軸
         //RaycastHit2D hit = Physics2D.Raycast(transform.position, move_dir, 0.5f, wall_layer);
         RaycastHit2D hit = Physics2D.Raycast(transform.position, (velocity + force).normalized, 0.35f, wall_layer);
@@ -166,14 +166,13 @@ public class My2Dphysic : MonoBehaviour
             is_near_wall = false;
             return;
         }
-
         is_near_wall = true;
         //if (hit.point.x > transform.position.x)
         if (hit.normal.x < 0)
         { //牆在右:
             Vector2 _adjust_pos = transform.position;
             //物體x軸限制
-            _adjust_pos.x = Mathf.Clamp(_adjust_pos.x, _adjust_pos.x, hit.point.x - 0.35f);
+            _adjust_pos.x = Mathf.Clamp(_adjust_pos.x, _adjust_pos.x, hit.point.x - 0.3f);
             transform.position = _adjust_pos;
         }
         else
@@ -181,12 +180,11 @@ public class My2Dphysic : MonoBehaviour
             //牆在左
             Vector2 _adjust_pos = transform.position;
             //物體x軸限制
-            _adjust_pos.x = Mathf.Clamp(_adjust_pos.x, hit.point.x + 0.35f, _adjust_pos.x);
+            _adjust_pos.x = Mathf.Clamp(_adjust_pos.x, hit.point.x + 0.3f, _adjust_pos.x);
             transform.position = _adjust_pos;
         }
 
-        AddForce(hit.normal * mass / forceDrag);
-        Debug.Log(hit.normal* mass / forceDrag);
+        AddForce(hit.normal * mass);
 
     }
 
