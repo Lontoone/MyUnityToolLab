@@ -1,4 +1,4 @@
-The code is still in development stage.
+The code is still in development stage. (sorry,i misspelled "physic" which should be "physics")
 腳本還在開發階段
 
 It is a pseudo physic script that only tries to make sense, and not phyically accurate.
@@ -26,6 +26,7 @@ How To Use [My2DPhysic.cs]:
     
   use example:
     if player want to move, write sth like this:
+    * rigid = gameObject.GetComponent<My2Dphysic>();
     
      private void Update(){
         rigid.velocity.x = Input.GetAxis("Horizontal") * your_speed;
