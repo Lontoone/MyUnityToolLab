@@ -39,8 +39,11 @@ How To Use [My2DPhysic.cs]:
        }
 
 How To Use [My2DCollider.cs]:
+
   This script requires unity Collider2D component.
+  
   Because unity onCollision__ event will only be triggered when rigidbody2D is attached, which is replaced by My2DPhysic.cs is this case. So this script is meant to take charge of the event triggering.
+  
   It will work fine in defult with My2DPhysic.
   The parameter [public LayerMask entity_layer] meant what layer's object can trigger the event.
   
