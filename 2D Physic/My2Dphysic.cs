@@ -12,7 +12,7 @@ public class My2Dphysic : MonoBehaviour
     public bool isEntity; //是否為可碰撞實體
     public Vector2 force = new Vector2(0, 0); //f=mass*gravity //在此為額外給予的力
     public float forceDrag = 0.1f;
-   
+
     public LayerMask ground_layer;
     public LayerMask wall_layer;
 
@@ -82,7 +82,7 @@ public class My2Dphysic : MonoBehaviour
             Vector3 slope_down_force = Vector3.Cross(Vector3.up, (Vector3)hit.normal); //斜度對速度的加成
             float ground_frition = (hit.collider.sharedMaterial != null) ? hit.collider.sharedMaterial.friction : 1;//地面摩擦力
 
-            Debug.Log("地面斜度:" + slope_down_force);
+            //Debug.Log("地面斜度:" + slope_down_force);
             if (!freezeRotation_z)
             {
                 gameObject.transform.Rotate(0, 0, slope_angle * angular_acceleration * Time.deltaTime);
@@ -102,7 +102,6 @@ public class My2Dphysic : MonoBehaviour
         {
             //往下加速度
             velocity.y -= gravity * Time.deltaTime;
-            //Debug.Log("V:" + velocity + " force:" + force);
         }
         else
         {
@@ -110,17 +109,17 @@ public class My2Dphysic : MonoBehaviour
             if (velocity.y != 0)
             {
                 //反作用力 f=ma
-                float anitiForce = Mathf.Lerp(-velocity.y / mass, 0, forceDrag * Time.deltaTime); //TODO{}現在只會往上彈
-                if (anitiForce * 0.5f > gravity)
+                float anitiForce = Mathf.Lerp(-velocity.y * mass / forceDrag, 0, Time.deltaTime); //TODO{}現在只會往上彈
+                //if (anitiForce * 0.5f > gravity)
+                if (anitiForce /mass > gravity)
                 {
-                    AddForce(-velocity.normalized * (anitiForce * 0.5f - gravity));
-                    //Debug.Log(-velocity.normalized + " v:" + anitiForce);
+                    AddForce(-velocity.normalized * (anitiForce /mass - gravity));
                 }
                 velocity.y = 0;
             }
 
             //防止陷入地面下
-            RaycastHit2D hit_in_ground = Physics2D.Raycast(footPositon.transform.position, Vector2.down, 0.5f, ground_layer);//?NOTE:distance太長會抓到地板的另一端
+            RaycastHit2D hit_in_ground = Physics2D.Raycast(footPositon.transform.position, Vector2.down, 0.25f, ground_layer);//?NOTE:distance太長會抓到地板的另一端
             if (hit_in_ground.collider != null)
             {
                 transform.position = new Vector2(transform.position.x, hit_in_ground.point.y + pull_from_ground_radious * 2);//?NOTE:加的值太大會抖
@@ -136,7 +135,7 @@ public class My2Dphysic : MonoBehaviour
             force = new Vector2(Mathf.Lerp(force.x, 0, forceDrag * Time.deltaTime), Mathf.Lerp(force.y, 0, forceDrag * Time.deltaTime));
         }
 
-        //移動方向設定
+        //移動方向設定(分左右)
         if ((velocity.x + force.x) > 0) { move_dir = Vector2.right; }
         else { move_dir = Vector2.left; }
 
@@ -146,6 +145,7 @@ public class My2Dphysic : MonoBehaviour
         transform.position = _move;
 
         Wall_block();
+
     }
 
     public void AddForce(Vector2 _force)
@@ -159,7 +159,8 @@ public class My2Dphysic : MonoBehaviour
     {
 
         //向移動的方向射ray，若ray打到牆壁則依面向的方向限制x軸
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, move_dir, 0.5f, wall_layer);
+        //RaycastHit2D hit = Physics2D.Raycast(transform.position, move_dir, 0.5f, wall_layer);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, (velocity + force).normalized, 0.35f, wall_layer);
         if (hit.collider == null)
         {
             is_near_wall = false;
@@ -167,7 +168,8 @@ public class My2Dphysic : MonoBehaviour
         }
 
         is_near_wall = true;
-        if (hit.point.x > transform.position.x)
+        //if (hit.point.x > transform.position.x)
+        if (hit.normal.x < 0)
         { //牆在右:
             Vector2 _adjust_pos = transform.position;
             //物體x軸限制
@@ -182,6 +184,9 @@ public class My2Dphysic : MonoBehaviour
             _adjust_pos.x = Mathf.Clamp(_adjust_pos.x, hit.point.x + 0.35f, _adjust_pos.x);
             transform.position = _adjust_pos;
         }
+
+        AddForce(hit.normal * mass / forceDrag);
+        Debug.Log(hit.normal* mass / forceDrag);
 
     }
 
@@ -209,7 +214,7 @@ public class My2Dphysic : MonoBehaviour
         if (rigid != null && rigid.isEntity)
         {
             Vector2 dir = transform.position - rigid.transform.position;
-            //Vector2 dir = rigid.move_dir; //TODO:[bug]會滑掉
+            //Vector2 dir = rigid.move_dir; //[bug]會滑掉
 
             rigid.AddForce(dir * mass * Time.deltaTime);
         }
@@ -224,23 +229,26 @@ public class My2Dphysic : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
+
+        Gizmos.color = Color.green;
         //碰牆線
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, (velocity).normalized, 5, wall_layer);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, (velocity + force).normalized, 5f, wall_layer);
         if (hit.collider != null)
         {
             Gizmos.DrawLine(transform.position, hit.point);
         }
 
         //TEST:
+        /*
         if (footPositon != null)
         {
-            RaycastHit2D hit_in_ground = Physics2D.Raycast(footPositon.transform.position, Vector2.down, pull_from_ground_radious, ground_layer);
+            Gizmos.color = Color.green;
+            RaycastHit2D hit_in_ground = Physics2D.Raycast(footPositon.transform.position, Vector2.down, 0.25f, ground_layer);
             if (hit_in_ground.collider != null)
             {
                 Gizmos.DrawLine(footPositon.transform.position, hit_in_ground.point);
             }
-        }
+        }*/
 
     }
 
