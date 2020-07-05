@@ -1,7 +1,7 @@
 The code is still in development stage.
 腳本還在開發階段
 
-It is a pseudo physic script that only trying to make sense, and not phyically accurate.
+It is a pseudo physic script that only tries to make sense, and not phyically accurate.
 
 
 demo:
