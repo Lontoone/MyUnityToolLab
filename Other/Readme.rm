@@ -1,1 +1,22 @@
-Save And Load script
+Scripts info:
+
+SaveAndLoad.cs
+
+How to use:
+
+Make sure your own class is tagged with [System.Serializable].
+
+Function name ends with "_bin" means binary. The data is saved in binary format. Otherwise the data is saved in Json format.
+
+
+Save:
+  SaveAndLoad.Save_bin<myType>(myData, myPath);
+  
+  SaveAndLoad.Save<myType>(myData, myPath);
+  
+Load:
+  myType mydate = SaveAndLoad.Load(myPath);
+  
+  myType mydate = SaveAndLoad.Load_bin(myPath);
+
+If you want to save dictionery type, simple use the binary one.
