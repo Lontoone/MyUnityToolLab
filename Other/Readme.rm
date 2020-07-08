@@ -20,3 +20,29 @@ Load:
   myType mydate = SaveAndLoad.Load_bin(myPath);
 
 If you want to save dictionery type, simple use the binary one.
+
+
+<hr>
+
+腳本資訊:
+
+SaveAndLoad.cs
+
+用法
+
+使用前記得將自訂類別標上 [System.Serializable]。
+
+結尾是 "_bin" 的方法代表示存成2進位檔. 其他則是Json格式。
+
+
+存檔:
+  SaveAndLoad.Save_bin<myType>(myData, myPath);
+  
+  SaveAndLoad.Save<myType>(myData, myPath);
+  
+讀檔:
+  myType mydate = SaveAndLoad.Load(myPath);
+  
+  myType mydate = SaveAndLoad.Load_bin(myPath);
+
+如果想存字典型態，可以用二進位的方法存。(Json不支援字典型態)
