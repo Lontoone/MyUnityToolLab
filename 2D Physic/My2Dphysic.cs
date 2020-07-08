@@ -86,7 +86,7 @@ public class My2Dphysic : MonoBehaviour
             if (!freezeRotation_z)
             {
                 gameObject.transform.Rotate(0, 0, slope_angle * angular_acceleration * Time.deltaTime);
-                //TODO[]:因為碰撞判斷是圓形，方形物體會停在奇妙的角度
+                //TODO[]:因為碰撞判斷是圓形，方形物體不會那麼自然
             }
 
             //陸地(摩擦力)移動
@@ -124,7 +124,6 @@ public class My2Dphysic : MonoBehaviour
             {
                 transform.position = new Vector2(transform.position.x, hit_in_ground.point.y + pull_from_ground_radious * 2);//?NOTE:加的值太大會抖
                 if (force.y < 0) { force.y = 0; }
-                //force.y = Mathf.Clamp(force.y, 0, force.y);
             }
         }
 
@@ -136,9 +135,10 @@ public class My2Dphysic : MonoBehaviour
             force = new Vector2(Mathf.Lerp(force.x, 0, forceDrag * Time.deltaTime), Mathf.Lerp(force.y, 0, forceDrag * Time.deltaTime));
         }
 
-        //移動方向設定(分左右)
-        if ((velocity.x + force.x) > 0) { move_dir = Vector2.right; }
-        else { move_dir = Vector2.left; }
+        //移動方向設定(分左右?)
+        move_dir = (velocity + force).normalized;
+        //if ((velocity.x + force.x) > 0) { move_dir = Vector2.right; }
+        //else if ((velocity.x + force.x) < 0) { move_dir = Vector2.left; }
 
         //移動
         Vector2 _move = (Vector2)transform.position + (velocity + force) * Time.deltaTime;
@@ -159,20 +159,18 @@ public class My2Dphysic : MonoBehaviour
     void Wall_block()
     {
         //向移動的方向射ray，若ray打到牆壁則依面向的方向限制x軸
-        //RaycastHit2D hit = Physics2D.Raycast(transform.position, move_dir, 0.5f, wall_layer);
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, (velocity + force).normalized, 0.35f, wall_layer);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, (velocity + force).normalized, 0.5f, wall_layer);
         if (hit.collider == null)
         {
             is_near_wall = false;
             return;
         }
         is_near_wall = true;
-        //if (hit.point.x > transform.position.x)
         if (hit.normal.x < 0)
         { //牆在右:
             Vector2 _adjust_pos = transform.position;
             //物體x軸限制
-            _adjust_pos.x = Mathf.Clamp(_adjust_pos.x, _adjust_pos.x, hit.point.x - 0.3f);
+            _adjust_pos.x = Mathf.Clamp(_adjust_pos.x, _adjust_pos.x, hit.point.x - 0.2f);
             transform.position = _adjust_pos;
         }
         else
@@ -180,7 +178,7 @@ public class My2Dphysic : MonoBehaviour
             //牆在左
             Vector2 _adjust_pos = transform.position;
             //物體x軸限制
-            _adjust_pos.x = Mathf.Clamp(_adjust_pos.x, hit.point.x + 0.3f, _adjust_pos.x);
+            _adjust_pos.x = Mathf.Clamp(_adjust_pos.x, hit.point.x + 0.2f, _adjust_pos.x);
             transform.position = _adjust_pos;
         }
 
@@ -196,11 +194,9 @@ public class My2Dphysic : MonoBehaviour
         //被撞到時:
         if (rigid != null && rigid.isEntity)
         {
-            //Debug.Log(gameObject.name + " V: " + (rigid.velocity) + " enter " + _collider.name + " V: " + (velocity) + " ENTER FORCE:" + (velocity) * mass);
-
             //能量轉移
             Vector2 _trans_force = (velocity) * mass;
-            Debug.Log(gameObject.name + " V: " + (rigid.velocity) + " enter " + _collider.name + " V: " + (velocity) + " ENTER FORCE:" + _trans_force);
+            //Debug.Log(gameObject.name + " V: " + (rigid.velocity) + " enter " + _collider.name + " V: " + (velocity) + " ENTER FORCE:" + _trans_force);
             rigid.AddForce(_trans_force);
         }
 
