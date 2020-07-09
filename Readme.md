@@ -1,6 +1,6 @@
 # Who Am I?
 
- I'm Lontoone, a Taiwanese self-taught game developer student, as well as degital art ,3D modeling and web dev.
+ I'm Lontoone, a Taiwanese self-taught game developer student, as well as digital art ,3D modeling and web dev.
  
  I am not a code pro, but just started up this repo hope you can find something useful.
 
