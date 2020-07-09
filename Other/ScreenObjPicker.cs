@@ -19,7 +19,7 @@ public class ScreenObjPicker : MonoBehaviour
 
     ///<summary>選擇中的物件</summary>
     [SerializeField]
-    List<ControlableObj> SelectingObjs = new List<ControlableObj>();
+    List<PickableObject> SelectingObjs = new List<PickableObject>();
 
     ///<summary>選中的物體可執行的行為</summary>
     public event Action DoableEvent;
@@ -37,7 +37,7 @@ public class ScreenObjPicker : MonoBehaviour
         }
         if (SelectingObjs.Count > 0 && Input.GetMouseButtonDown(1))
         {
-            foreach (ControlableObj obj in SelectingObjs)
+            foreach (PickableObject obj in SelectingObjs)
             {
                 //選擇路徑
                 SelectPath();
@@ -60,7 +60,7 @@ public class ScreenObjPicker : MonoBehaviour
         //選擇物體
         if (Physics.Raycast(ray, out hit, 10, SelectableLayers))
         {
-            ControlableObj item = hit.collider.GetComponent<ControlableObj>();
+            PickableObject item = hit.collider.GetComponent<PickableObject>();
             if (item != null &&
                 hit.collider.GetComponent<NavMeshAgent>() != null)
             {
@@ -82,7 +82,7 @@ public class ScreenObjPicker : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 100, WalkableLayers))
         {
-            foreach (ControlableObj obj in SelectingObjs)
+            foreach (PickableObject obj in SelectingObjs)
             {
                 obj.movePoint = hit.point;
                 obj.GetComponent<NavMeshAgent>().SetDestination(hit.point);
@@ -124,7 +124,7 @@ public class ScreenObjPicker : MonoBehaviour
     {
         //SelectingObjs.Clear();
         SelectClear();
-        foreach (ControlableObj obj in GameObject.FindObjectsOfType<ControlableObj>())
+        foreach (PickableObject obj in GameObject.FindObjectsOfType<PickableObject>())
         {
             if (!SelectingObjs.Exists(e => e == obj))
             {
@@ -145,7 +145,7 @@ public class ScreenObjPicker : MonoBehaviour
     {
         if (SelectingObjs.Count > 0)
         {
-            foreach (ControlableObj obj in SelectingObjs)
+            foreach (PickableObject obj in SelectingObjs)
             {
                 obj.DeChosen();
             }
