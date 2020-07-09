@@ -22,6 +22,13 @@ Load:
 If you want to save dictionery type, simple use the binary one.
 
 
+ScreenObjPicker.cs
+
+By using this script, you can group select object from the screen view.
+
+
+
+
 
 腳本資訊:
 
