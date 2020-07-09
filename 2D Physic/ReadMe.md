@@ -32,16 +32,18 @@ The colored balls moved because they attached my [BasicAI](https://github.com/Lo
    `public float forceDrag` : If the value is smaller, it will be more bouncy.
     
   ### example:
-   if player want to move, write sth like this:
+   if player wants to move, write sth like this:
    
-    `My2Dphysic rigid;`
-    `void Start(){ rigid = gameObject.GetComponent<My2Dphysic>();}`
+    My2Dphysic rigid;
+    void Start(){
+      rigid = gameObject.GetComponent<My2Dphysic>();
+    }
     
      private void Update(){
         rigid.velocity.x = Input.GetAxis("Horizontal") * your_speed;
      }
     
-   if player want to jump, write sth like this:
+   if player wants to jump, write sth like this:
    
      if (Input.GetKeyDown(KeyCode.Space) && rigid.isGrounded)
        {
