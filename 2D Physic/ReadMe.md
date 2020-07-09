@@ -20,10 +20,15 @@ The colored balls moved because they attached my [BasicAI](https://github.com/Lo
   Parameter explain:
   
    `public bool isEntity` true if this object is collideable. same concept as Unity collider's [isTrigger] function. 
+   
    `public Vector2 force` : value that push the gameobject, use Addforce(vector2) to change value is recommended.
+   
    `public bool freezeRotation_z`: The same function as Unity's rigidboyd ["freeze rotation z"]
+   
    `public float angular_acceleration` : if freezeRotation_z is unchecked, it controls the speed of z-rotation when object is on a slope.
+   
    `public float friction_self` : the friction when the object is on a slope.
+   
    `public float forceDrag` : If the value is smaller, it will be more bouncy.
     
   ### example:
