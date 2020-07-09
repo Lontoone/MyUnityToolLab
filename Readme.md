@@ -18,6 +18,9 @@
     
     - I want a better control of my game's physics rather than Unity rigidbody provieded, so I wrote my replacement for Unity rigidbody 2D.
 
+  - [2D BasicAI](https://github.com/Lontoone/MyUnityToolLab/blob/master/Other/BasicAI.cs)
+    
+    - Auto walk,jump,idle and chase a enemy layer object in the range.
 
 <hr>
 
@@ -40,6 +43,10 @@
   - [2D 物理](https://github.com/Lontoone/MyUnityToolLab/tree/master/2D%20Physic)
     
     - 為了想要有更好自己控制的物理，所以我自己寫了一個用來取代Unity rigidbody 2D 的物理腳本。
+    
+  - [2D 基本怪物AI](https://github.com/Lontoone/MyUnityToolLab/blob/master/Other/BasicAI.cs)
+    
+    - 自動走、跳、閒置 或追隨範圍內的目標layer物件。
 
 
 
