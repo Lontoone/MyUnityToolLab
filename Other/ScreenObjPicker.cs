@@ -40,14 +40,8 @@ public class ScreenObjPicker : MonoBehaviour
             foreach (ControlableObj obj in SelectingObjs)
             {
                 //選擇路徑
-                if (obj.workMode == ControlableObj.WorkMode.Move)
-                {
-                    SelectPath();
-                }
-                else if (obj.workMode == ControlableObj.WorkMode.Attack)
-                {
+                SelectPath();
 
-                }
             }
         }
 
@@ -56,7 +50,6 @@ public class ScreenObjPicker : MonoBehaviour
         {
             DoableEvent();
         }
-        //else { Debug.Log("ACTION沒東西"); }
     }
     ///<summary>單選取物件</summary>
     void SelectObj()
@@ -73,15 +66,12 @@ public class ScreenObjPicker : MonoBehaviour
             {
                 if (!SelectingObjs.Exists(e => e == item))
                 {
-                    //SelectingObj = hit.collider.GetComponent<ControlableObj>();
                     SelectingObjs.Add(item);
                     item.GotChosen();
-                    //agent = hit.collider.GetComponent<NavMeshAgent>();
-                    //Debug.Log(SelectingObj.name);
                 }
             }
         }
-       
+
     }
 
     ///<summary>移動</summary>
@@ -92,12 +82,10 @@ public class ScreenObjPicker : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 100, WalkableLayers))
         {
-           
             foreach (ControlableObj obj in SelectingObjs)
             {
                 obj.movePoint = hit.point;
                 obj.GetComponent<NavMeshAgent>().SetDestination(hit.point);
-                //TODO:特效
             }
         }
     }
@@ -131,7 +119,7 @@ public class ScreenObjPicker : MonoBehaviour
         if (Input.GetMouseButtonUp(0)) { firstPos = Vector2.zero; }
     }
 
-    
+
     void RangeSelect()
     {
         //SelectingObjs.Clear();
@@ -142,13 +130,11 @@ public class ScreenObjPicker : MonoBehaviour
             {
                 Vector2 screen_pos;
                 screen_pos = Camera.main.WorldToScreenPoint(obj.transform.position);
-                //screen_pos = RectTransformUtility.WorldToScreenPoint(Camera.main, obj.transform.position);
                 screen_pos.y = Camera.main.pixelHeight - screen_pos.y;
                 if (IsInsideRect(firstPos, Event.current.mousePosition, screen_pos))
                 {
                     SelectingObjs.Add(obj);
                     obj.GotChosen();
-                    //Debug.Log(firstPos + " " + Event.current.mousePosition + " " + obj.gameObject.name + " " + screen_pos);
                 }
             }
 
