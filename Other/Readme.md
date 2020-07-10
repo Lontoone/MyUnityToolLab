@@ -114,7 +114,9 @@ The script ScreenObjPicker is better to go with the script PickableObject which 
 如果想存字典型態，可以用二進位的方法存。(Json不支援字典型態)
 
 <hr>
+
 ## BasicAI.cs (2D)
+
  自動行走的基本AI。
   
   腳本帶有基本的Walk,Idle,Jump 事件。 也會偵測並追隨範圍內的指定圖層物件。
