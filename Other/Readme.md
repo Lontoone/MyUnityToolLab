@@ -28,6 +28,7 @@ If you want to save dictionery type, simple use the binary one.
 <hr>
 
 ## BasicAI.cs (2D)
+
   It is for auto-move game objects.
   
   The script contains basic events that will automatically triggered, so you can have your own class to do the effect, such as "Walk","Jump" and "Idle". And also will chase the objects of enemy layer that is in sight(a 2D collider).
