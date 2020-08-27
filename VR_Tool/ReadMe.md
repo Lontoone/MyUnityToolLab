@@ -21,3 +21,15 @@ It shoot ray as a pointer, and should be attached on player's hand.
 
 `Open Input` Which button to open the ray.
 
+Beside, it provides event with information to call for scripts:
+`
+ public static event Action<GameObject, Vector3> ePointer_hover;
+ 
+ public static event Action<GameObject> ePointer_leave;
+ 
+ public static event Action<GameObject> ePointer_down;
+`
+
+Example:
+`Pointer.ePointer_hover += OnHover;`
+
