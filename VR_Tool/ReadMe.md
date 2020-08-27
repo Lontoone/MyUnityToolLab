@@ -14,7 +14,10 @@ It shoot ray as a pointer, and should be attached on player's hand.
 ![image](https://i.imgur.com/R66cld1.png) 
 
 `Length` is for ray's length.
+
 `Dot` is the end point of the ray. You can pot a sphere on it just for better visualization.
+
 `Input Source` Which hand can use the ray.
+
 `Open Input` Which button to open the ray.
 
