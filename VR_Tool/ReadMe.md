@@ -31,5 +31,6 @@ Beside, it provides event with information to call for scripts:
 `
 
 Example:
+
 `Pointer.ePointer_hover += OnHover;`
 
