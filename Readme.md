@@ -23,7 +23,7 @@
     
     - Auto walk,jump,idle and chase a enemy layer object in the range.
     
-   -[2D BreakToPieces](https://github.com/Lontoone/MyUnityToolLab/tree/master/2DBreakMeshToPieces)
+   - [2D BreakToPieces](https://github.com/Lontoone/MyUnityToolLab/tree/master/2DBreakMeshToPieces)
    
     - Break 2D sprite effect.
 
@@ -54,7 +54,7 @@
     
     - 自動走、跳、閒置 或追隨範圍內的目標layer物件。
 
-   -[2D Sprite爆破](https://github.com/Lontoone/MyUnityToolLab/tree/master/2DBreakMeshToPieces)
+   - [2D Sprite爆破](https://github.com/Lontoone/MyUnityToolLab/tree/master/2DBreakMeshToPieces)
    
     - sprite爆炸效果
 
