@@ -25,7 +25,7 @@
     
    - [2D BreakToPieces](https://github.com/Lontoone/MyUnityToolLab/tree/master/2DBreakMeshToPieces)
    
-    - Break 2D sprite effect.
+     - Break 2D sprite effect.
 
 <hr>
 
@@ -56,6 +56,6 @@
 
    - [2D Sprite爆破](https://github.com/Lontoone/MyUnityToolLab/tree/master/2DBreakMeshToPieces)
    
-    - sprite爆炸效果
+     - sprite爆炸效果
 
 
