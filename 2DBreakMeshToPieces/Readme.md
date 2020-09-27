@@ -14,3 +14,6 @@ In gif, Mesh seems twisted because I set the random value `minVertexRandom`.
 
 Please don't set `subDivide` value too high because it will create a lot of mesh objects. 1~5 is recommended.
 
+This demo mini game is attatched.
+
+![image](https://i.imgur.com/d7fK9f2.gif) 
