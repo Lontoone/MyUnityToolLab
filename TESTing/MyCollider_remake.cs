@@ -55,7 +55,7 @@ public class MyCollider : MonoBehaviour
             Debug.Log("旋轉了 " + delta_rotation.z + " 共轉 " + _tmp_rotationCounter);
 
             SetRotatedPos();
-            CheckCollision(FindObjectsOfType<MyCollider>());
+            CheckCollision(tmp_current_colliders);
 
             previous_rotation = transform.eulerAngles;
         }
@@ -104,7 +104,6 @@ public class MyCollider : MonoBehaviour
         foreach (MyCollider c in colliders)
         {
             if (c == this) { continue; }
-            bool isSeperate = false;
             for (int i = 0; i < c.vertices.Count; i++)
             {
                 Vector2 current_normal = c.normals[i];
@@ -117,22 +116,19 @@ public class MyCollider : MonoBehaviour
 
                 if (otherMinMax[0] > thisMinMax[1] || thisMinMax[0] > otherMinMax[1])
                 {
-                    Debug.Log("<color=green>SAFE!</color>");
+                    Debug.Log(c.transform.name + " to " + transform.name + "<color=green> SAFE!</color>");
                     c.spr.color = safe;
                     spr.color = safe;
 
-                    isSeperate = true;
                     break;
                 }
                 else
                 {
-                    Debug.Log("<color=red>碰撞</color>");
+                    Debug.Log(c.transform.name + " to " + transform.name + "<color=red>碰撞</color>");
                     c.spr.color = collideC;
                     spr.color = collideC;
                 }
             }
-
-            if (isSeperate) { continue; }
 
             for (int i = 0; i < vertices.Count; i++)
             {
@@ -144,14 +140,14 @@ public class MyCollider : MonoBehaviour
 
                 if (otherMinMax[0] > thisMinMax[1] || thisMinMax[0] > otherMinMax[1])
                 {
-                    Debug.Log("<color=green>SAFE!</color>");
+                    Debug.Log(transform.name + " to " + c.transform.name + "<color=green> SAFE!</color>");
                     c.spr.color = safe;
                     spr.color = safe;
                     break;
                 }
                 else
                 {
-                    Debug.Log("<color=red>碰撞</color>");
+                    Debug.Log(transform.name + " to " + c.transform.name + "<color=red>碰撞</color>");
                     c.spr.color = collideC;
                     spr.color = collideC;
                 }
