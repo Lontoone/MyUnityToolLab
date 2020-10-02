@@ -90,8 +90,8 @@ public class MyCollider : MonoBehaviour
     {
         for (int i = 0; i < vertices.Count; i++)
         {
-            //vertices[i] = GetRotated_Pos(delta_rotation.z * Mathf.Deg2Rad, vertices_originPos[i], transform.position);
-            vertices[i] = GetRotated_Pos(transform.rotation.z, vertices_originPos[i], transform.position);
+            vertices[i] = GetRotated_Pos(transform.rotation.z * Mathf.Deg2Rad, vertices_originPos[i], transform.position);
+            //vertices[i] = GetRotated_Pos(transform.rotation.z, vertices_originPos[i], transform.position);
         }
         //設定法線
         for (int i = 0; i < vertices.Count; i++)
@@ -134,11 +134,11 @@ public class MyCollider : MonoBehaviour
 
     Vector3 GetRotated_Pos(float angle, Vector3 currentPos, Vector3 center)
     {
-        /*
+
         var new_x = (currentPos.x * Mathf.Cos(angle)) - (currentPos.y * Mathf.Sin(angle));
         var new_y = (currentPos.x * Mathf.Sin(angle)) + (currentPos.y * Mathf.Cos(angle));
-        return new Vector2(new_x, new_y);*/
-        return Quaternion.Euler(0, 0, angle) * (currentPos - center) + center;
+        return new Vector2(new_x, new_y);
+        //return Quaternion.Euler(0, 0, angle) * (currentPos - center) + center;
 
     }
 
@@ -169,7 +169,7 @@ public class MyCollider : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        /*
+
         for (int i = 0; i < normals.Count; i++)
         {
             Gizmos.DrawLine(transform.position, transform.TransformPoint(normals[i]));
@@ -178,7 +178,7 @@ public class MyCollider : MonoBehaviour
         for (int i = 0; i < vertices.Count; i++)
         {
             Gizmos.DrawWireSphere(transform.TransformPoint(vertices[i]), 0.25f);
-        }*/
+        }
     }
     //把sprite轉mesh
     public Mesh SpriteToMesh(Sprite sp)
