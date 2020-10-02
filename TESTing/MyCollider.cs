@@ -57,6 +57,7 @@ public class MyCollider : MonoBehaviour
         else
             hasMoved = false;
 
+        StayCheck();
     }
 
     public void SetUPVertex()
@@ -104,7 +105,10 @@ public class MyCollider : MonoBehaviour
     public void AddCollider(MyCollider newCollider)
     {
         if (newCollider == this)
+        {
+            Debug.Log("是自己");
             return;
+        }
 
         //STAY
         if (current_colliding_objs.Exists(a => a == newCollider))
@@ -142,7 +146,19 @@ public class MyCollider : MonoBehaviour
 
     }
 
-
+    void StayCheck()
+    {
+        if (current_colliding_objs.Count > 0)
+        {
+            for (int i = 0; i < current_colliding_objs.Count; i++)
+            {
+                if (!belongGroup.colliders.Exists(a => a == current_colliding_objs[i]))
+                {
+                    RemoveCollider(current_colliding_objs[i]);
+                }
+            }
+        }
+    }
 
     public float[] GetMaxMinDot(Vector2 dotNormal, List<Vector3> verties, Transform obj)
     {

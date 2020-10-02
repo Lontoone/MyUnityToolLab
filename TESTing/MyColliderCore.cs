@@ -135,7 +135,6 @@ public class MyColliderCore : MonoBehaviour
         //檢查該組有沒有移動過
         if (!group.CheckHasMoved())
         {
-            Debug.Log("跳過!");
             return;
         }
 
@@ -147,7 +146,6 @@ public class MyColliderCore : MonoBehaviour
                 for (int j = i + 1; j < group_colliders_count; j++)
                 {
                     int j_index = j % group_colliders_count;
-                    //Debug.Log(j_index);
                     bool isColliding = CheckCollision(group.colliders[i], group.colliders[j_index]);
                     //TODO:碰撞處理
                     if (isColliding)
