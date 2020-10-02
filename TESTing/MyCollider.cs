@@ -106,7 +106,6 @@ public class MyCollider : MonoBehaviour
     {
         if (newCollider == this)
         {
-            Debug.Log("是自己");
             return;
         }
 

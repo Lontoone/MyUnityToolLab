@@ -7,19 +7,16 @@ using System.Linq;
 public class MyColliderCore : MonoBehaviour
 {
     public List<ColliderGroup> colliderGroups = new List<ColliderGroup>();
-    public float max_group_bounds = 10;
-    bool canCheck = true;
+    public float max_group_bounds = 4;
+    public float group_max_distance = 3;
     private void FixedUpdate()
     {
-        canCheck = !canCheck;
-
-        //TEST
-        foreach (ColliderGroup group in colliderGroups)
-            GroupCollision(group);
+        //canCheck = !canCheck;
+        //foreach (ColliderGroup group in colliderGroups) GroupCollision(group);
     }
     private void Start()
     {
-        //MyCollider.eMoved += GroupCollision;
+        MyCollider.eMoved += GroupCollision;
         MyCollider.eMoved += GroupCheck;
 
         colliderGroups = SetUpAllGroups(max_group_bounds);
@@ -27,7 +24,7 @@ public class MyColliderCore : MonoBehaviour
     }
     private void OnDestroy()
     {
-        //MyCollider.eMoved -= GroupCollision;
+        MyCollider.eMoved -= GroupCollision;
         MyCollider.eMoved -= GroupCheck;
     }
 
@@ -56,7 +53,7 @@ public class MyColliderCore : MonoBehaviour
             for (int j = 0; j < groups_tmp.Count; j++)
             {
                 if (groups[i].colliders.Exists(a => a == groups_tmp[j].colliders[0])) { continue; }
-                if (CheckIsInsideBoundsCircle(groups[i].center, max_group_bounds, groups_tmp[j].colliders[0]))
+                if (CheckIsInsideBoundsCircle(groups[i].center, groups_tmp[j].colliders[0].spr.bounds.extents, groups_tmp[j].colliders[0]))
                 {
                     groups[i] = MergeGroup(groups[i], groups_tmp[j].colliders[0]);
                     groups[i].UpdateCenter();
@@ -77,11 +74,12 @@ public class MyColliderCore : MonoBehaviour
         return groups;
     }
 
-    ColliderGroup MergeGroup(ColliderGroup groupA, ColliderGroup groupB)//B融進A
+    void MergeGroup(ColliderGroup groupA, ColliderGroup groupB)//B融進A
     {
-        ColliderGroup newGroup = new ColliderGroup();
-        newGroup.colliders = groupA.colliders.Concat(groupB.colliders).ToList();
-        return newGroup;
+        for (int i = 0; i < groupB.colliders.Count; i++)
+        {
+            TransferGroup(groupB, groupA, groupB.colliders[i]);
+        }
     }
     ColliderGroup MergeGroup(ColliderGroup groupA, MyCollider collider)//B融進A
     {
@@ -100,13 +98,9 @@ public class MyColliderCore : MonoBehaviour
             float[] AMinMax = colliderA.GetMaxMinDot(current_normal, colliderA.vertices, colliderA.transform);
             float[] BMinMax = colliderB.GetMaxMinDot(current_normal, colliderB.vertices, colliderB.transform);
 
-            Debug.DrawLine(new Vector2(AMinMax[0], 0), new Vector2(AMinMax[1], 0), Color.black, 1f);
-            Debug.DrawLine(new Vector2(BMinMax[0], 0), new Vector2(BMinMax[1], 0), Color.white, 1f);
-
             if (AMinMax[0] > BMinMax[1] || BMinMax[0] > AMinMax[1])
             {
                 //Debug.Log(colliderA.transform.name + " to " + colliderB.transform.name + "<color=green> SAFE!</color>");
-
                 return false;
             }
         }
@@ -115,9 +109,6 @@ public class MyColliderCore : MonoBehaviour
             Vector2 current_normal = colliderB.normals[i];
             float[] AMinMax = colliderA.GetMaxMinDot(current_normal, colliderA.vertices, colliderA.transform);
             float[] BMinMax = colliderB.GetMaxMinDot(current_normal, colliderB.vertices, colliderB.transform);
-            Debug.DrawLine(new Vector2(AMinMax[0], 0), new Vector2(AMinMax[1], 0), Color.red, 1f);
-            Debug.DrawLine(new Vector2(BMinMax[0], 0), new Vector2(BMinMax[1], 0), Color.green, 1f);
-
             if (AMinMax[0] > BMinMax[1] || BMinMax[0] > AMinMax[1])
             {
                 Debug.Log(colliderB.transform.name + " to " + colliderA.transform.name + "<color=green> SAFE!</color>");
@@ -129,88 +120,80 @@ public class MyColliderCore : MonoBehaviour
 
     }
 
+
     //檢查組內碰撞
+    public void GroupCollision(MyCollider collider)
+    {
+        GroupCollision(collider.belongGroup);
+    }
     public void GroupCollision(ColliderGroup group)
     {
         //檢查該組有沒有移動過
-        if (!group.CheckHasMoved())
+        if (!group.CheckHasMoved() || group.colliders.Count < 2)
         {
             return;
         }
 
+        //int group_colliders_count = Mathf.CeilToInt(Mathf.Pow(group.colliders.Count, 0.5f));
         int group_colliders_count = group.colliders.Count;
-        foreach (MyCollider collider in group.colliders)
+
+        for (int i = 0; i < group_colliders_count - 1; i++)
         {
-            for (int i = 0; i < group_colliders_count - 1; i++)
+            for (int j = i + 1; j < group_colliders_count; j++)
             {
-                for (int j = i + 1; j < group_colliders_count; j++)
+                int j_index = j % group_colliders_count;
+                bool isColliding = CheckCollision(group.colliders[i], group.colliders[j_index]);
+                //TODO:碰撞處理
+                if (isColliding)
                 {
-                    int j_index = j % group_colliders_count;
-                    bool isColliding = CheckCollision(group.colliders[i], group.colliders[j_index]);
-                    //TODO:碰撞處理
-                    if (isColliding)
-                    {
-                        //互相登記對方
-                        group.colliders[i].AddCollider(group.colliders[j_index]);
-                        group.colliders[j_index].AddCollider(group.colliders[i]);
-                    }
-                    else
-                    {
-                        //TODO:檢查離開
-                        group.colliders[i].RemoveCollider(group.colliders[j_index]);
-                        group.colliders[j_index].RemoveCollider(group.colliders[i]);
-                    }
+                    //互相登記對方
+                    group.colliders[i].AddCollider(group.colliders[j_index]);
+                    group.colliders[j_index].AddCollider(group.colliders[i]);
+                }
+                else
+                {
+                    //TODO:檢查離開
+                    group.colliders[i].RemoveCollider(group.colliders[j_index]);
+                    group.colliders[j_index].RemoveCollider(group.colliders[i]);
                 }
             }
         }
+
     }
     //檢查移動後的物體是否還在該group範圍內
     public void GroupCheck(MyCollider collider)
     {
-        //沒超過group範圍=>更新該group center位置
-        if (CheckIsInsideBoundsCircle(collider.belongGroup.center, max_group_bounds, collider))
+        //if (CheckIsInsideBoundsCircle(collider.belongGroup.center, collider.belongGroup.bounds.extents * 0.5f, collider))return;
+        if (CheckIsInsideBoundsCircle(collider.belongGroup.center, (Vector2)collider.spr.bounds.size * 0.5f, collider)) return;
+
+        if ((collider.belongGroup.center - (Vector2)collider.transform.position).magnitude > group_max_distance)
         {
-            //collider.belongGroup.UpdateCenter();
+            //創個組給自己
+            ColliderGroup self_group = new ColliderGroup();
+            TransferGroup(collider.belongGroup, self_group, collider);
+            return;
         }
         else
         {
-            //colliderGroups = SetUpAllGroups(max_group_bounds);
-
-            //如果與原center太遠=> 找最近的group
             for (int i = 0; i < colliderGroups.Count; i++)
             {
-                if (CheckIsInsideBoundsCircle(colliderGroups[i].center, max_group_bounds, collider))
+                if (collider.belongGroup == colliderGroups[i]) { continue; }
+                if (CheckIsInsideBoundsCircle(colliderGroups[i].center, colliderGroups[i].bounds.extents, collider))
                 {
-                    ColliderGroup oldGroup = collider.belongGroup;
-                    //找到就轉換
-                    TransferGroup(collider.belongGroup, colliderGroups[i], collider);
-
+                    MergeGroup(collider.belongGroup, colliderGroups[i]);
                     return;
                 }
             }
-
-            //找不到=>自立一個
-            ColliderGroup newGroup = new ColliderGroup();
-            TransferGroup(collider.belongGroup, newGroup, collider);
-
         }
     }
-
-    public ColliderGroup FindNearestGroup(MyCollider collider)
-    {
-        ColliderGroup newGroup = new ColliderGroup();
-        //foreach Groups 找center離collider最近的group
-        return newGroup;
-    }
-
-    public bool CheckIsInsideBoundsCircle(Vector2 center, float radious, MyCollider c)
+    public bool CheckIsInsideBoundsCircle(Vector2 center, Vector2 radious, MyCollider c)
     {
         //AABB檢測
         // Rect1
-        float minX1 = center.x - radious;
-        float maxX1 = center.x + radious;
-        float minY1 = center.y - radious;
-        float maxY1 = center.y + radious;
+        float minX1 = center.x - radious.x;
+        float maxX1 = center.x + radious.x;
+        float minY1 = center.y - radious.y;
+        float maxY1 = center.y + radious.y;
         // Rect2
         float minX2 = c.spr.bounds.center.x - c.spr.bounds.extents.x;
         float maxX2 = c.spr.bounds.center.x + c.spr.bounds.extents.x;
@@ -233,13 +216,23 @@ public class MyColliderCore : MonoBehaviour
         {
             colliderGroups.Add(to);
         }
+        if (to.colliders.Contains(collider)) { return; }
 
+        //若轉移目標group太多物件了 就踢掉一個叫它自創
+        if (to.colliders.Count > max_group_bounds)
+        {
+            ColliderGroup newto = new ColliderGroup();
+            TransferGroup(to, newto, to.colliders[0]);
+
+            return;
+        }
+
+        //轉移
         from.colliders.Remove(collider);
         collider.belongGroup = to;
         to.colliders.Add(collider);
 
         to.UpdateCenter();
-
         if (from.colliders.Count < 1)
         {
             colliderGroups.Remove(from);
@@ -248,7 +241,6 @@ public class MyColliderCore : MonoBehaviour
         {
             from.UpdateCenter();
         }
-
     }
 
     private void OnDrawGizmos()
@@ -260,7 +252,8 @@ public class MyColliderCore : MonoBehaviour
             {
                 Gizmos.DrawLine(colliderGroups[i].center, c.transform.position);
             }
-            Gizmos.DrawWireSphere(colliderGroups[i].center, max_group_bounds);
+            //Gizmos.DrawWireSphere(colliderGroups[i].center, max_group_bounds);
+            Gizmos.DrawWireCube(colliderGroups[i].center, colliderGroups[i].bounds.size);
         }
     }
 
@@ -272,13 +265,26 @@ public class ColliderGroup
     public List<MyCollider> colliders = new List<MyCollider>();
     public Vector2 center = new Vector2(); //group中心
 
+    public Bounds bounds = new Bounds();
+
     //重新計算中心
     public void UpdateCenter()
     {
         Vector3 _tmp = new Vector3();
         colliders.ForEach(a => _tmp += a.transform.position);
         center = _tmp / (float)colliders.Count;
-        Debug.Log("新的center " + center);
+
+        UpdateBounds();
+    }
+
+    public void UpdateBounds()
+    {
+        bounds = new Bounds();
+        foreach (MyCollider c in colliders)
+        {
+            bounds.Encapsulate(c.spr.bounds);
+        }
+
     }
 
     //檢查群組內有物體移動?
@@ -286,7 +292,6 @@ public class ColliderGroup
     {
         return colliders.Exists(a => a.hasMoved == true);
     }
-
 
 
 }
