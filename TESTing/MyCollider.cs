@@ -57,8 +57,9 @@ public class MyCollider : MonoBehaviour
         else
             hasMoved = false;
 
-        StayCheck();
+        //StayCheck();
     }
+
 
     public void SetUPVertex()
     {

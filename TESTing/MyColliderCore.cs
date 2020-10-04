@@ -6,20 +6,22 @@ using System.Linq;
 //碰撞核心
 public class MyColliderCore : MonoBehaviour
 {
+    /////<summary>來源、接收、法線</summary>
+    //public static event Action<MyCollider, MyCollider, Vector2> eOnCollide;
     public List<ColliderGroup> colliderGroups = new List<ColliderGroup>();
-    public float max_group_bounds = 4;
+    public float group_max_colliders = 4;
     public float group_max_distance = 3;
-    private void FixedUpdate()
-    {
+    /*
+    private void FixedUpdate(){
         //canCheck = !canCheck;
         //foreach (ColliderGroup group in colliderGroups) GroupCollision(group);
-    }
+    }*/
     private void Start()
     {
         MyCollider.eMoved += GroupCollision;
         MyCollider.eMoved += GroupCheck;
 
-        colliderGroups = SetUpAllGroups(max_group_bounds);
+        colliderGroups = SetUpAllGroups(group_max_colliders);
         Debug.Log("組數" + colliderGroups.Count);
     }
     private void OnDestroy()
@@ -57,17 +59,13 @@ public class MyColliderCore : MonoBehaviour
                 {
                     groups[i] = MergeGroup(groups[i], groups_tmp[j].colliders[0]);
                     groups[i].UpdateCenter();
-                    //groups_tmp.RemoveAt(j);
                 }
                 else if (i == 0)
                 {
                     groups.Add(groups_tmp[j]);
                 }
-
-
             }
         }
-        //groups.AddRange(groups_tmp);
 
         groups.Distinct();
 
@@ -100,7 +98,6 @@ public class MyColliderCore : MonoBehaviour
 
             if (AMinMax[0] > BMinMax[1] || BMinMax[0] > AMinMax[1])
             {
-                //Debug.Log(colliderA.transform.name + " to " + colliderB.transform.name + "<color=green> SAFE!</color>");
                 return false;
             }
         }
@@ -111,10 +108,9 @@ public class MyColliderCore : MonoBehaviour
             float[] BMinMax = colliderB.GetMaxMinDot(current_normal, colliderB.vertices, colliderB.transform);
             if (AMinMax[0] > BMinMax[1] || BMinMax[0] > AMinMax[1])
             {
-                Debug.Log(colliderB.transform.name + " to " + colliderA.transform.name + "<color=green> SAFE!</color>");
-
                 return false;
             }
+
         }
         return true;
 
@@ -129,12 +125,9 @@ public class MyColliderCore : MonoBehaviour
     public void GroupCollision(ColliderGroup group)
     {
         //檢查該組有沒有移動過
-        if (!group.CheckHasMoved() || group.colliders.Count < 2)
-        {
-            return;
-        }
+        if (!group.CheckHasMoved()) { return; }
+        if (group.colliders.Count < 2) { group.colliders[0].current_colliding_objs.Clear(); return; }
 
-        //int group_colliders_count = Mathf.CeilToInt(Mathf.Pow(group.colliders.Count, 0.5f));
         int group_colliders_count = group.colliders.Count;
 
         for (int i = 0; i < group_colliders_count - 1; i++)
@@ -163,27 +156,32 @@ public class MyColliderCore : MonoBehaviour
     //檢查移動後的物體是否還在該group範圍內
     public void GroupCheck(MyCollider collider)
     {
-        //if (CheckIsInsideBoundsCircle(collider.belongGroup.center, collider.belongGroup.bounds.extents * 0.5f, collider))return;
-        if (CheckIsInsideBoundsCircle(collider.belongGroup.center, (Vector2)collider.spr.bounds.size * 0.5f, collider)) return;
 
+        //移動距離不大時，跳過
+        //if (CheckIsInsideBoundsCircle(collider.belongGroup.center, collider.belongGroup.bounds.extents * 0.5f, collider))return;
+        //if (CheckIsInsideBoundsCircle(collider.belongGroup.center, (Vector2)collider.spr.bounds.size * 0.1f, collider)) return;
+        //找到有沾到邊的其他群組加入
+        for (int i = 0; i < colliderGroups.Count; i++)
+        {
+            if (collider.belongGroup == colliderGroups[i]) { continue; }
+            if (CheckIsInsideBoundsCircle(colliderGroups[i].center, colliderGroups[i].bounds.extents, collider))
+            {
+                //把目前碰撞中的物體也加進來
+                ColliderGroup to = colliderGroups[i];
+                //collider.current_colliding_objs.ForEach(a => MergeGroup(a.belongGroup, to));
+                MergeGroup(collider.belongGroup, to);
+                return;
+            }
+        }
+        //離組的中心太遠
         if ((collider.belongGroup.center - (Vector2)collider.transform.position).magnitude > group_max_distance)
         {
             //創個組給自己
             ColliderGroup self_group = new ColliderGroup();
+            //把目前碰撞中的物體也加進來
+            collider.current_colliding_objs.ForEach(a => MergeGroup(self_group, a.belongGroup));
             TransferGroup(collider.belongGroup, self_group, collider);
             return;
-        }
-        else
-        {
-            for (int i = 0; i < colliderGroups.Count; i++)
-            {
-                if (collider.belongGroup == colliderGroups[i]) { continue; }
-                if (CheckIsInsideBoundsCircle(colliderGroups[i].center, colliderGroups[i].bounds.extents, collider))
-                {
-                    MergeGroup(collider.belongGroup, colliderGroups[i]);
-                    return;
-                }
-            }
         }
     }
     public bool CheckIsInsideBoundsCircle(Vector2 center, Vector2 radious, MyCollider c)
@@ -219,7 +217,7 @@ public class MyColliderCore : MonoBehaviour
         if (to.colliders.Contains(collider)) { return; }
 
         //若轉移目標group太多物件了 就踢掉一個叫它自創
-        if (to.colliders.Count > max_group_bounds)
+        if (to.colliders.Count > group_max_colliders)
         {
             ColliderGroup newto = new ColliderGroup();
             TransferGroup(to, newto, to.colliders[0]);
@@ -231,6 +229,7 @@ public class MyColliderCore : MonoBehaviour
         from.colliders.Remove(collider);
         collider.belongGroup = to;
         to.colliders.Add(collider);
+
 
         to.UpdateCenter();
         if (from.colliders.Count < 1)
@@ -257,6 +256,7 @@ public class MyColliderCore : MonoBehaviour
         }
     }
 
+    //public MyCollider RayCastHit(Vector2 origin, Vector2 direction, float distance, string tag){}
 }
 
 [System.Serializable]
@@ -293,5 +293,15 @@ public class ColliderGroup
         return colliders.Exists(a => a.hasMoved == true);
     }
 
+    public bool CheckContainsAll(List<MyCollider> checks)
+    {
+        foreach (MyCollider c in checks)
+        {
+            if (!colliders.Contains(c))
+                return false;
+        }
+        return true;
+
+    }
 
 }
