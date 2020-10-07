@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System;
+[RequireComponent(typeof(HitableObj))]
 public class BreakToPiece : MonoBehaviour
 {
     SpriteRenderer spr;
@@ -11,21 +12,24 @@ public class BreakToPiece : MonoBehaviour
     [Tooltip("用到動畫spriteSheet才要打")]
     public string img_resource_path = "Img/";
     public event Action<GameObject> eCreateNewPiece;
+    public float gapTime = 0.01f;
+    public bool doRectBox = true;//產生方形而不是三角形的碎片
     HitableObj hitable;
     private void Start()
     {
         hitable = gameObject.GetComponent<HitableObj>();
-        if (hitable != null)
-            hitable.Die_event += DoBreak;
-
+        hitable.Die_event += DoBreak;
     }
     private void OnDestroy()
     {
-        if (hitable != null)
-            hitable.Die_event -= DoBreak;
+        hitable.Die_event -= DoBreak;
+    }
+    private void DoBreak()
+    {
+        StartCoroutine(BreakSlowly_coro());
     }
 
-    public void DoBreak()
+    IEnumerator BreakSlowly_coro()
     {
         spr = gameObject.GetComponent<SpriteRenderer>();
 
@@ -59,8 +63,6 @@ public class BreakToPiece : MonoBehaviour
         {
             for (int yi = 0; yi < n - 1; yi++)
             {
-                //Debug.Log((n * xi * yi) + " " + (n * xi + yi + 1) + " " + (n * (xi + 1) + yi + 1));
-
                 //正方形左上角= nXi+Yi , nXi+Yi+1 , n(Xi+1)+Yi+1
                 int[] left_tri = new int[] {
                     n * xi + yi,
@@ -81,53 +83,75 @@ public class BreakToPiece : MonoBehaviour
         subDividedMesh.SetVertices(vertices);
         subDividedMesh.SetUVs(0, uvs);
         subDividedMesh.SetTriangles(tris, 0);
-        /*
-
-        GameObject newSubMesh_obj = new GameObject();
-        newSubMesh_obj.transform.position = transform.position;
-        newSubMesh_obj.transform.localScale = transform.localScale;
-
-        newSubMesh_obj.AddComponent<MeshFilter>().mesh = subDividedMesh;
-
-        //Material material = new Material(shader);
-        Material material = spr.material;
-        if (img_resource_path != "")
-            material.mainTexture = ConvertSpriteToTexture(GetSpriteFromSheet(spr.sprite.texture, spr.sprite.name));
-        else
-            material.mainTexture = spr.sprite.texture;
-
-        newSubMesh_obj.AddComponent<MeshRenderer>().material = material;
-        */
 
         //拆成更小的
-        for (int i = 0; i < subDividedMesh.triangles.Length - 2; i += 3)
+        //四角形的
+        if (doRectBox)
         {
-            Mesh newPiece = SeparateMesh(subDividedMesh, i);
+            for (int i = 0; i < subDividedMesh.triangles.Length - 5; i += 6)
+            {
+                Mesh newPiece = SeparateMesh_rect(subDividedMesh, i);
 
-            //位置處理
-            GameObject newSubMesh_obj = new GameObject();
-            newSubMesh_obj.transform.position = transform.position - subDividedMesh.bounds.center * 0.5f;
-            newSubMesh_obj.transform.localScale = transform.localScale;
+                //位置處理
+                GameObject newSubMesh_obj = new GameObject();
+                newSubMesh_obj.transform.position = transform.position - subDividedMesh.bounds.center * 0.5f;
+                newSubMesh_obj.transform.localScale = transform.localScale;
 
-            newSubMesh_obj.AddComponent<MeshFilter>().mesh = newPiece;
+                newSubMesh_obj.AddComponent<MeshFilter>().mesh = newPiece;
 
-            //貼圖處理 (動畫sheet需要拆解)
-            //Material material = new Material(shader);
-            Material material = spr.material;
-            if (img_resource_path != "")
-                material.mainTexture = ConvertSpriteToTexture(GetSpriteFromSheet(spr.sprite.texture, spr.sprite.name));
-            else
-                material.mainTexture = spr.sprite.texture;
+                //貼圖處理 (動畫sheet需要拆解)
+                //Material material = new Material(shader);
+                Material material = spr.material;
+                if (img_resource_path != "")
+                    material.mainTexture = ConvertSpriteToTexture(GetSpriteFromSheet(spr.sprite.texture, spr.sprite.name));
+                else
+                    material.mainTexture = spr.sprite.texture;
 
-            newSubMesh_obj.AddComponent<MeshRenderer>().material = material;
+                newSubMesh_obj.AddComponent<MeshRenderer>().material = material;
 
-            //給後續處理
-            if (eCreateNewPiece != null)
-                eCreateNewPiece(newSubMesh_obj);
+                //給後續處理
+                if (eCreateNewPiece != null)
+                    eCreateNewPiece(newSubMesh_obj);
 
-            //刪掉原本的
-            Destroy(gameObject);
+                yield return new WaitForSeconds(gapTime);
+                //刪掉原本的
+                //Destroy(gameObject);
+            }
         }
+        //三角形的
+        else
+        {
+            for (int i = 0; i < subDividedMesh.triangles.Length - 2; i += 3)
+            {
+                Mesh newPiece = SeparateMesh(subDividedMesh, i);
+
+                //位置處理
+                GameObject newSubMesh_obj = new GameObject();
+                newSubMesh_obj.transform.position = transform.position - subDividedMesh.bounds.center * 0.5f;
+                newSubMesh_obj.transform.localScale = transform.localScale;
+
+                newSubMesh_obj.AddComponent<MeshFilter>().mesh = newPiece;
+
+                //貼圖處理 (動畫sheet需要拆解)
+                //Material material = new Material(shader);
+                Material material = spr.material;
+                if (img_resource_path != "")
+                    material.mainTexture = ConvertSpriteToTexture(GetSpriteFromSheet(spr.sprite.texture, spr.sprite.name));
+                else
+                    material.mainTexture = spr.sprite.texture;
+
+                newSubMesh_obj.AddComponent<MeshRenderer>().material = material;
+
+                //給後續處理
+                if (eCreateNewPiece != null)
+                    eCreateNewPiece(newSubMesh_obj);
+
+                yield return new WaitForSeconds(gapTime);
+                //刪掉原本的
+                //Destroy(gameObject);
+            }
+        }
+        Destroy(gameObject);
     }
 
     public Mesh SeparateMesh(Mesh _oldMesh, int startIndex)
@@ -149,7 +173,28 @@ public class BreakToPiece : MonoBehaviour
         pieceMesh.uv = uv;
         return pieceMesh;
     }
-
+    public Mesh SeparateMesh_rect(Mesh _oldMesh, int startIndex)
+    {
+        Mesh pieceMesh = new Mesh();
+        Vector3[] vertices = new Vector3[4];
+        int[] old_triangle = new int[4]{_oldMesh.triangles[startIndex],
+                                    _oldMesh.triangles[startIndex+1],
+                                    _oldMesh.triangles[startIndex+2],
+                                    _oldMesh.triangles[startIndex+5]};
+        vertices[0] = _oldMesh.vertices[old_triangle[0]];
+        vertices[1] = _oldMesh.vertices[old_triangle[1]];
+        vertices[2] = _oldMesh.vertices[old_triangle[2]];
+        vertices[3] = _oldMesh.vertices[old_triangle[3]];
+        pieceMesh.vertices = vertices;
+        pieceMesh.triangles = new int[6] { 0, 3, 2, 0, 2, 1 };
+        Vector2[] uv = new Vector2[4];
+        uv[0] = _oldMesh.uv[old_triangle[0]];
+        uv[1] = _oldMesh.uv[old_triangle[1]];
+        uv[2] = _oldMesh.uv[old_triangle[2]];
+        uv[3] = _oldMesh.uv[old_triangle[3]];
+        pieceMesh.uv = uv;
+        return pieceMesh;
+    }
     //把sprite轉mesh
     public Mesh SpriteToMesh(Sprite sp)
     {
@@ -163,14 +208,12 @@ public class BreakToPiece : MonoBehaviour
 
     public Sprite GetSpriteFromSheet(Texture2D texture, string spriteName)
     {
-
         Debug.Log(texture.name + " " + spriteName);
         Sprite[] sprites = Resources.LoadAll<Sprite>(img_resource_path + texture.name);
         Sprite resulte = sprites.Single(s => s.name == spriteName);
         Debug.Log(resulte.name);
         return resulte;
     }
-
     Texture2D ConvertSpriteToTexture(Sprite sprite)
     {
         try
