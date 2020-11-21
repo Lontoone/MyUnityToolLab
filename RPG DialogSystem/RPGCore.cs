@@ -1,17 +1,24 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Text.RegularExpressions;
 using System.Linq;
 using System;
-
+using UnityEngine.SceneManagement;
 public class RPGCore
 {
+    public static Lang lang = Lang.EN;//語言 
+    public const string DEFULT_SCENE_NAME = "GameScene";
     //應在遊戲關閉前儲存的主要進度
-    public static Dictionary<string, string> StoryRecord = new Dictionary<string, string>(); //TODO:需要init
+    public static Dictionary<string, string> StoryRecord = new Dictionary<string, string>(); //需要init
 
     //暫時的變數(生命週期應只有1個故事腳本，應在故事腳本讀完後呼叫 Clear_Temp_StoryRecord 清除)
-    public static Dictionary<string, string> temp_StoryRecord = new Dictionary<string, string>(); //TODO:需要init
+    public static Dictionary<string, string> temp_StoryRecord = new Dictionary<string, string>(); //需要init
+    public static readonly Dictionary<string, string> ESC_CHAR = new Dictionary<string, string>() //跳脫字元
+    {
+        {"\\<", "[@lt]"},{"\\>", "[@gt]"}
+    };
+
 
     #region //=============REGEX=================
     //初始拆解格式
@@ -49,6 +56,12 @@ public class RPGCore
         title= Lontoone The first
     */
     public const string REGEX_ARGS_TITLE = @"title\s*=\s*['""]?(?<title>[^'""]+)['""]?";
+
+    //用來尋找場景中的物件名稱，將UI放置在該物件旁
+    /*EXAMPLE
+        by="objname"
+    */
+    public const string REGEX_ARGS_BY = @"by\s*=\s*['""]?(?<by>[^'""]+)['""]?";
 
     //設定變數  ※注 key為temp_開頭的用temp dictionary處理
     /* EXAMPLE
@@ -90,10 +103,20 @@ public class RPGCore
                                         \s*(?<conjunction>[|&]*)
                                         ";
 
+    //取得自定義變數
+    /*EXAMPLE: $[key ] */
+    public const string REGEX_CUSTOM_VARIABLE = @"\$\[\s*(?<key>\w+)\s*\]";
+
+    //EXTRA (自定義擴充): 方法名稱-參數(split by',')
+    public const string REGEX_FUNC_PARA = @"(?<func>\w+)\s*
+                                            \(
+                                            (?<para>[^\)]+)
+                                            \s*\)";
+
     #endregion
 
     //讀取文本
-    public static List<Line> ReadLines(string path)
+    public static List<Line> ReadLines(string data)
     {
         List<Line> _lines = new List<Line>();
         Regex regex = new Regex(REGEX_SPLIT_LINES,
@@ -102,8 +125,18 @@ public class RPGCore
                                            | RegexOptions.Singleline
                                            | RegexOptions.IgnorePatternWhitespace);
 
-        string data = Resources.Load<TextAsset>(path).text;
+
+        //string data = Resources.Load<TextAsset>(path).text;
         Debug.Log("讀取文本: " + data);
+
+        //取代跳脫字元
+        for (int i = 0; i < ESC_CHAR.Count; i++)
+        {
+            data = data.Replace(ESC_CHAR.ElementAt(i).Key, ESC_CHAR.ElementAt(i).Value);
+
+        }
+
+        //拆解巢狀
         Match match = regex.Match(data);
         while (match.Success)
         {
@@ -111,6 +144,8 @@ public class RPGCore
             Line _tempLine = new Line(groups["tag"].Value,
                                       groups["arg"].Value,
                                       groups["text"].Value);
+
+
             _lines.Add(_tempLine);
             match = match.NextMatch();
         }
@@ -144,6 +179,7 @@ public class RPGCore
             //else{}
         }
     }
+
 
     //==============DICTIONARY==================
     //清空暫存變數
@@ -180,7 +216,6 @@ public class RPGCore
             else
                 StoryRecord.Add(key, value);
         }
-        Debug.Log(StoryRecord.Count);
         Debug.Log("設定 " + key + " " + value);
     }
     public static string GetDictValue(string key, out bool isExist)
@@ -210,6 +245,29 @@ public class RPGCore
     {
         bool _temp;
         return GetDictValue(key, out _temp);
+    }
+
+    //讀取自定義變數
+    public static string ReadCustomVariables(string input)
+    {
+        string outPut = input;
+        Regex regex = new Regex(REGEX_CUSTOM_VARIABLE,
+                                           RegexOptions.IgnoreCase
+                                          | RegexOptions.Compiled
+                                          | RegexOptions.Singleline
+                                          | RegexOptions.IgnorePatternWhitespace);
+        Match match = regex.Match(outPut);
+        while (match.Success)
+        {
+            GroupCollection groups = match.Groups;
+            string _dict_key = groups["key"].Value;
+            string _pattern = @"\$\[\s*" + _dict_key + @"\s*\]"; //臨時pattern
+            Debug.Log("取代" + _dict_key + " with " + _pattern);
+            outPut = Regex.Replace(outPut, _pattern, GetDictValue(_dict_key));
+            match = match.NextMatch();
+        }
+        Debug.Log(outPut);
+        return outPut;
     }
 
     public static bool if_compare(string arg)
@@ -244,6 +302,7 @@ public class RPGCore
                 _current_result = false;
                 Debug.Log("<color=red> <if> 不存在的key" + _key + " </color>");
                 match = match.NextMatch();
+                continue;
             }
 
             //_value是變數還是純值?
@@ -336,4 +395,75 @@ public class RPGCore
         public int endLine;
         public int startLine;
     }
+
+    public enum Lang
+    {
+        EN, ZH
+    };
+
+    //放回跳脫字元
+    public static string Put_Back_EscChar(string input)
+    {
+        string output = input;
+        for (int i = 0; i < ESC_CHAR.Count; i++)
+        {
+            output = output.Replace(ESC_CHAR.ElementAt(i).Value, ESC_CHAR.ElementAt(i).Key.Substring(1));
+        }
+        return output;
+    }
+
+
+    //***********EXTRA**********  you can delete it if you want.//
+    #region Scene
+    public static IEnumerator LoadScene(string sceneName, GameObject playerToMove, string spawnPointName)
+    {
+        if (!SceneManager.GetSceneByName(sceneName).isLoaded)
+        {
+            AsyncOperation async = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+            while (!async.isDone)
+            {
+                Debug.Log("scene loading :" + async.progress);
+                yield return null;
+            }
+        }
+        yield return new WaitForSeconds(0.1f);
+        //傳送至指定物件位置
+        Debug.Log(spawnPointName + " " + playerToMove);
+        if (spawnPointName != "" && playerToMove != null)
+        {
+            Vector3 _targetPos = GameObject.Find(spawnPointName).transform.position;
+            playerToMove.transform.position = _targetPos;
+        }
+
+    }
+
+    public static IEnumerator UnloadScene(string unloadName, string exceptSceneName)
+    {
+        if (unloadName == "all")
+        {
+            //紀錄要刪除的scene
+            Queue<Scene> scenesToUnload = new Queue<Scene>();
+            int max_scene = SceneManager.sceneCount;
+            for (int i = 0; i < max_scene; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+                //不要移除的scene
+                if (scene.name != exceptSceneName)
+                    scenesToUnload.Enqueue(scene);
+            }
+
+            for (int i = 0; i < scenesToUnload.Count; i++)
+            {
+                string _deque_name = scenesToUnload.Dequeue().name;
+                Debug.Log("deqeue " + _deque_name);
+                SceneManager.UnloadSceneAsync(_deque_name);
+                yield return new WaitForEndOfFrame();
+            }
+        }
+        else
+        {
+            SceneManager.UnloadSceneAsync(unloadName);
+        }
+    }
+    #endregion
 }
