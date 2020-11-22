@@ -1,4 +1,5 @@
 The main part are `RPG Core.cs`, `StoryReader.cs` ,`OptionButton.cs`.
+This tool is still in testing.
 
 Example
 
@@ -11,13 +12,19 @@ Example
 Check out [this demo project.](https://github.com/Lontoone/RPGCore_demo) or watch the [demo video](https://youtu.be/urDFmhzHlts).
 All the story condition checks are done by this tool [(example)](https://github.com/Lontoone/RPGCore_demo/blob/master/RPG_Demo/Assets/Resources/Story/EN/Kid.xml), other scripts only deal with player movement.
 
+I use .xml as file extension only because it is easier to edit on vscode.
+
 ## Rules for typing tags.
 
 >You can check out regexs at `RPG Core.cs`.
 
 -Start by `<story>` and end with `</story>` tag.
 
--Add `\` before `<` and `>`.
+-Add `\` before `<` and `>` if it is in the content.
+```
+EXAMPLE
+<l > \<color=red\> Red content text! \</color\> </l>
+```
 
 ### ```<l> </l>```
 
@@ -94,7 +101,7 @@ img(left,"img1")
 img(middle,'img2')
 img(right,/imgfolder/img1)
 ```
-If you are using the style that similar to Janapens galgame, use it to load the picture under `Resources` folider and define which position to place. lefe,middle and right are just image variables in `StoryReader.cs`.
+If you are using the style that similar to Janapens galgame, use it to load the picture under `Resources` folider and define which position to place. left,middle and right are just image variables in `StoryReader.cs`.
 
 
 ### set
@@ -144,6 +151,20 @@ functionName( arg1, arg2 ,arg3,arg4.......);
 ```
   At `ReadArgs` funtuion in `StoryReader.cs`, there is a place marked `YOUR OWN SCRIPT FUNCTION`. for example, `myFunc(v1,v2,v3,v4....)`,then `myFunc` is the `functionName` and parameters are splited by`,`.
 
+
+Argments are not limited to one in one line!
+```
+EXAMPLE
+ 	<l title="Dog" 
+        by="Dog"
+        img(right,"Img/Portrait/p1")  
+	effect(shake) 
+        animation(obj1,clip_hi)
+        animation(obj2,clip_ya)
+        animation(obj3,Idle)
+        > woof woof
+	</l>
+```
 
 ---
 
