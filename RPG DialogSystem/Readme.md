@@ -162,6 +162,12 @@ WON'T WORK
 
 ---
 
+### enable| disable (obj1,obj2,obj3....)
+
+Enable or disable gameobjects. 
+
+---
+
 ### Other
 
 Any argument that doesn't match regex above also can be catched. Add your own argument function by following the rule:
