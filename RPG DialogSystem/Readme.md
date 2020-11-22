@@ -170,6 +170,7 @@ functionName( arg1, arg2 ,arg3,arg4.......);
 ```
   At `ReadArgs` funtuion in `StoryReader.cs`, there is a place marked `YOUR OWN SCRIPT FUNCTION`. for example, `myFunc(v1,v2,v3,v4....)`,then `myFunc` is the `functionName` and parameters are splited by`,`.
 
+---
 
 Argments are not limited to one in one line!
 ```
@@ -206,6 +207,7 @@ Contains regexs , in charge of spliting nesting tags and other basic funtions.
  
  > I am not a regex pro, this is just a workaround to allow me typing `<` or `>` in the dialog.
  
+ ---
  
  # Story Reader.cs:
  
@@ -213,3 +215,8 @@ Contains regexs , in charge of spliting nesting tags and other basic funtions.
  
  To start a conversation, simply call `StartConversation` function. see [StoryTrigger.cs](https://github.com/Lontoone/MyUnityToolLab/blob/master/RPG%20DialogSystem/StoryTrigger.cs) for example.
  
+ ---
+ 
+ # Story Trigger.cs:
+ 
+Asign your defult lanuage dialog text file to ```TextAsset text```. While converstation start, it will find the file with same name as `text` under other `lang` folder.
