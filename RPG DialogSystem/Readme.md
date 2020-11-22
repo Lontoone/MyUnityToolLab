@@ -25,10 +25,12 @@ I use .xml as file extension only because it is easier to edit on vscode.
 EXAMPLE
 <l > \<color=red\> Red content text! \</color\> </l>
 ```
-
+---
 ### ```<l> </l>```
 
  `l` refers to line. It wraps dialog contents.
+ 
+ ---
  
 ### ```<if> </if>```
 
@@ -41,6 +43,8 @@ Example
     
     <if(temp_a ==1)></if>
 ```
+
+---
 
 ### ```<Select> </Select>```
 
@@ -59,6 +63,8 @@ Example
 
 ```
 
+---
+
 ## Rules for Arguments
 
 
@@ -69,6 +75,8 @@ EXAMPLE
 ```
 Will find gameobject with `gameobjectName` in scene and play `clipName` if aniamtor is attached.
 
+---
+
 ### audio
 ```
 EXAMPLE
@@ -78,6 +86,8 @@ EXAMPLE
 ```
 Will find gameobject with `gameobjectName` in scene and set its audioSource's state.
 
+---
+
 ### title
 ```
 EXAMPLE
@@ -86,12 +96,16 @@ EXAMPLE
 
 Set the title.
 
+---
+
 ### by
 ```
 EXAMPLE
  by ="gameobjectname"
 ```
 If you are using the style that dialog will show above the gameobject in scene, use it to find gameobject with the name `gameobjectname` .
+
+---
 
 ### img
 ```
@@ -104,6 +118,8 @@ img(right,/imgfolder/img1)
 If you are using the style that similar to Janapens galgame, use it to load the picture under `Resources` folider and define which position to place. left,middle and right are just image variables in `StoryReader.cs`.
 
 
+---
+
 ### set
 ```
 EXAMPLE
@@ -114,6 +130,8 @@ EXAMPLE
 Set a variables, or create one if it is not defined.
 
 If variable's name start with`temp_`, then it will be clear out after the dialog end. Otherwise it will last the whole game. Keep in mind that you should write a script to save and load `StoryRecord` in `RPGCore.cs` before you close or open the game.
+
+---
 
 ### $[]
 Read a variable's value.
@@ -142,6 +160,7 @@ WON'T WORK
 <l> temp_a = "temp_a"</l>
 ```
 
+---
 
 ### Other
 
