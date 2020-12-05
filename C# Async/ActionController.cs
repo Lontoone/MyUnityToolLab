@@ -121,15 +121,8 @@ public class ActionController : MonoBehaviour
 
             //processQueueingTask = Task.Run(() => ProcessActionQueue(process_cts.Token));
             StartProcess();
-
-
         }
         await Task.Yield();
-    }
-
-    async void FuncTest()
-    {
-        await Task.Delay(5000);
     }
 
     //處理任務
@@ -223,7 +216,7 @@ public class ActionController : MonoBehaviour
         public float duration; //執行時間
         public float timeOut; //排隊超過時間就刪除? 沒有實際用到
 
-        public CancellationTokenSource cts = new CancellationTokenSource();
+
     }
 
 
