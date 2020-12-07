@@ -7,30 +7,15 @@ using System;
 public class GamePlay_FingerControler : MonoBehaviour
 {
     public static event Action<Vector2, bool> OnTouched;
-    bool isDraggingUI = true;
+    //bool isDraggingUI = true;
 
     private void Update()
     {
-        Debug.Log(Input.touchCount);
+#if UNITY_ANDROID
         if (Input.touchCount > 0)
-        {
-            TouchPhase touchPhase = Input.touches[0].phase;
-            //判斷點到的UI還是主畫面?
-            RaycastHit2D[] hits = TouchObjectFuntion.GetTouchedObj(0, touchPhase);
-            foreach (RaycastHit2D hit in hits)
-            {
-                //Debug.Log(hit.transform.name);
-                if (hit.transform.name == "MoveControl_Range")
-                {
-                    isDraggingUI = false;
-                    break;
-                }
-            }
-            Debug.Log(OnTouched == null);
-
+        { 
             if (OnTouched != null)
             {
-                //Debug.Log("On Touched" + Input.touches[0].position);
                 OnTouched(Input.touches[0].position, isDraggingUI);
             }
             else
@@ -38,9 +23,22 @@ public class GamePlay_FingerControler : MonoBehaviour
                 Debug.Log("ontouch is null");
             }
         }
+        /*
         if (Input.touchCount > 0 && (Input.touches[0].phase == TouchPhase.Ended || Input.touches[0].phase == TouchPhase.Canceled))
         {
             isDraggingUI = true;
+        }*/
+#endif
+
+#if UNITY_STANDALONE_WIN
+        if (Input.GetMouseButton(0))
+        {
+            if (OnTouched != null)
+            {
+                Debug.Log(Input.mousePosition);
+                OnTouched(Input.mousePosition, true);
+            }
         }
+#endif
     }
 }

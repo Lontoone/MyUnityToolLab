@@ -9,6 +9,7 @@ public class GamePlay_UIDragPanelControl : MonoBehaviour
 {
     public GamePlay_UI_btn graggingObj;
     public float gragSpeed = 15;
+    public float swap_gap=10;
     public static event Action<List<GamePlay_UI_btn>> eEndDrag; //結束拖拉
 
     [SerializeField]
@@ -16,7 +17,7 @@ public class GamePlay_UIDragPanelControl : MonoBehaviour
     [SerializeField]
     List<Vector2> uiLayoutOriginPos_list = new List<Vector2>(); //原本的位置(一開始固定，別改)
 
-    bool isOnDiscard = false;
+    //bool isOnDiscard = false;
     //丟棄區圖示
     public Sprite[] discard_backpack_imgs;
     public Image discard_backpack;
@@ -53,7 +54,7 @@ public class GamePlay_UIDragPanelControl : MonoBehaviour
             EventTrigger.Entry entry_end = new EventTrigger.Entry();
 
             //entry.eventID = EventTriggerType.PointerDown;
-            entry.eventID = EventTriggerType.Drag;
+            entry.eventID = EventTriggerType.InitializePotentialDrag;
             entry_dragging.eventID = EventTriggerType.Drag;
             entry_end.eventID = EventTriggerType.EndDrag;
 
@@ -104,12 +105,12 @@ public class GamePlay_UIDragPanelControl : MonoBehaviour
             if (_ui == graggingObj || graggingObj == null) { continue; }
 
             //如果正在拉的物件接近自己=> 和他交換固定位置
-            if (Vector2.Distance(graggingObj.transform.position, _ui.transform.position) < 50)
+            if (Vector2.Distance(graggingObj.transform.position, _ui.transform.position) < swap_gap)
             {
+                //Debug.Log(graggingObj.name + " swap " + _ui.name + " : " + Vector2.Distance(graggingObj.transform.position, _ui.transform.position));
                 SwapOriginPos(graggingObj, _ui);
                 break;
             }
-            //Debug.Log(graggingObj.name + " vs " + _ui.name + " : " + Vector2.Distance(graggingObj.transform.position, _ui.transform.position));
 
 
         }
@@ -135,39 +136,9 @@ public class GamePlay_UIDragPanelControl : MonoBehaviour
     //結束Drag:定位
     void OnEndDrag()
     {
-
-        Debug.Log("OnEndDrag " + isOnDiscard);
-
-        if (graggingObj == null)
-        {
-            Debug.Log("Gragging obj is null");
-            return;
-        }
-
-        if (Vector2.Distance(graggingObj.transform.position, discard_backpack.transform.position) < 100)
-        {
-            isOnDiscard = true;
-        }
-        else { isOnDiscard = false; }
-
-        //檢查丟棄:
-        if (isOnDiscard)
-        {
-            //移除場上人物
-            //DestroyImmediate(graggingObj.thisMask_obj);
-
-            uiLayoutOriginPos_list.RemoveAt(uiLayoutOriginPos_list.Count - 1); //移除最後一個位置:
-            uiLayout_list.Remove(graggingObj);
-            Destroy(graggingObj.gameObject);
-            ResetOrder();
-            Debug.Log("UI_LEN" + uiLayoutOriginPos_list.Count);
-            //return;
-        }
-
         graggingObj.transform.position = uiLayoutOriginPos_list[graggingObj.ui_sort_order];
         uiLayout_list.Sort((x, y) => x.ui_sort_order.CompareTo(y.ui_sort_order));
 
-        isOnDiscard = false;
         graggingObj = null;
 
         //結束
@@ -175,41 +146,6 @@ public class GamePlay_UIDragPanelControl : MonoBehaviour
             eEndDrag(uiLayout_list);
 
     }
-    public void ResetOrder()
-    {
-        int currentMaskCount = GameObject.FindObjectsOfType<GamePlay_UI_btn>().Length;
-        //Mask_PlayControl[] test = GameObject.FindObjectsOfType<Mask_PlayControl>();
-        uiLayout_list.Sort((x, y) => x.ui_sort_order.CompareTo(y.ui_sort_order));
-        for (int i = 0; i < currentMaskCount; i++)
-        {
 
-            uiLayout_list[i].ui_sort_order = i; //從0開始分配order
-            uiLayout_list[i].transform.position = uiLayoutOriginPos_list[i];
-            uiLayout_list[i].name = i.ToString();
-            //uiLayout_list[i].thisMask_obj.GetComponent<ObjectFollow>().sort_order = i;
-
-        }
-        //ObjectFollow.ResetTarget();
-    }
-
-    public void DiscardAtList(int _i) //BUG!!!
-    {
-        //Destroy(uiLayout_list[_i].thisMask_obj);
-        uiLayout_list.RemoveAt(_i);
-
-    }
-
-    public void HoverOnDiscard()
-    {
-        //isOnDiscard = true;
-        discard_backpack.sprite = discard_backpack_imgs[1];
-        //Debug.Log(isOnDiscard);
-    }
-    public void LeaveOnDiscard()
-    {
-        //isOnDiscard = false;
-        discard_backpack.sprite = discard_backpack_imgs[0];
-        //Debug.Log(isOnDiscard);
-    }
 
 }
