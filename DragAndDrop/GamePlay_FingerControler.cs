@@ -35,7 +35,6 @@ public class GamePlay_FingerControler : MonoBehaviour
         {
             if (OnTouched != null)
             {
-                Debug.Log(Input.mousePosition);
                 OnTouched(Input.mousePosition);
             }
         }

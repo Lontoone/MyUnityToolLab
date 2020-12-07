@@ -7,20 +7,17 @@ using UnityEngine.EventSystems;
 
 public class GamePlay_UIDragPanelControl : MonoBehaviour
 {
+    public bool horizontal = true;
+    public bool vertical = true;
     public GamePlay_UI_btn graggingObj;
     public float gragSpeed = 15;
-    public float swap_gap=10;
+    public float swap_gap = 10;
     public static event Action<List<GamePlay_UI_btn>> eEndDrag; //結束拖拉
 
     [SerializeField]
     List<GamePlay_UI_btn> uiLayout_list = new List<GamePlay_UI_btn>(); //展示每個角色狀態的UI
     [SerializeField]
     List<Vector2> uiLayoutOriginPos_list = new List<Vector2>(); //原本的位置(一開始固定，別改)
-
-    //bool isOnDiscard = false;
-    //丟棄區圖示
-    public Sprite[] discard_backpack_imgs;
-    public Image discard_backpack;
 
     private void Start()
     {
@@ -79,12 +76,18 @@ public class GamePlay_UIDragPanelControl : MonoBehaviour
 
     public void Gragging(Vector2 _goal)
     {
-        if ( graggingObj == null) { return; }
+        if (graggingObj == null) { return; }
+        Vector3 _move = graggingObj.transform.position;
 
+        if (horizontal)
+            _move.x = Mathf.Lerp(graggingObj.transform.position.x, _goal.x, gragSpeed * Time.deltaTime);
+        if (vertical)
+            _move.y = Mathf.Lerp(graggingObj.transform.position.y, _goal.y, gragSpeed * Time.deltaTime);
+        /*
         Vector3 _move = new Vector3(
                         graggingObj.transform.position.x,
                         Mathf.Lerp(graggingObj.transform.position.y, _goal.y, gragSpeed * Time.deltaTime),
-                        0);
+                        0);*/
         graggingObj.transform.position = _move;
     }
 
