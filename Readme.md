@@ -9,24 +9,7 @@
   Or [twitter](https://twitter.com/cuneisolar)
 
 ## What is in here:
-  Mainly cs scripts for unity. Scripts can work fine individually or bounded with 1~2 scripts.
-
-  - [Save And Load](https://github.com/Lontoone/MyUnityToolLab/blob/master/Other/SaveAndLoad.cs)
-    
-    - Provides easy ways for you to save and load custume class by json or binary format.
-
-  - [2D Physics](https://github.com/Lontoone/MyUnityToolLab/tree/master/2D%20Physic)
-    
-    - I want a better control of my game's physics rather than Unity rigidbody provieded, so I wrote my replacement for Unity rigidbody 2D.
-
-  - [2D BasicAI](https://github.com/Lontoone/MyUnityToolLab/blob/master/Other/BasicAI.cs)
-    
-    - Auto walk,jump,idle and chase a enemy layer object in the range.
-    
-   - [2D BreakToPieces](https://github.com/Lontoone/MyUnityToolLab/tree/master/2DBreakMeshToPieces)
-   
-     - Break 2D sprite effect.
-
+  Mainly cs scripts for unity. Scripts can work fine individually or bounded with 1~3 scripts.
 <hr>
 
 # 自我介紹
@@ -40,22 +23,5 @@
  開發進度會丟[twitter](https://twitter.com/cuneisolar)
 
 ## 內容
-  基本上都為Unity遊戲開發用到的小功能腳本，腳本大多可以獨自運作，有的可能要搭配1~2個類別。
-
-  - [存讀檔功能](https://github.com/Lontoone/MyUnityToolLab/blob/master/Other/SaveAndLoad.cs)
-    
-    - 提供簡單的存讀檔方法，可以用json或二進位檔存自己的類別資料。
-
-  - [2D 物理](https://github.com/Lontoone/MyUnityToolLab/tree/master/2D%20Physic)
-    
-    - 為了想要有更好自己控制的物理，所以我自己寫了一個用來取代Unity rigidbody 2D 的物理腳本。
-    
-  - [2D 基本怪物AI](https://github.com/Lontoone/MyUnityToolLab/blob/master/Other/BasicAI.cs)
-    
-    - 自動走、跳、閒置 或追隨範圍內的目標layer物件。
-
-   - [2D Sprite爆破](https://github.com/Lontoone/MyUnityToolLab/tree/master/2DBreakMeshToPieces)
-   
-     - sprite爆炸效果
-
+  基本上都為Unity遊戲開發用到的小功能腳本，腳本大多可以獨自運作，有的可能要搭配1~3個類別。
 
