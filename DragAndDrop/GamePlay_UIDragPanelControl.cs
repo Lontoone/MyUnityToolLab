@@ -52,7 +52,8 @@ public class GamePlay_UIDragPanelControl : MonoBehaviour
             EventTrigger.Entry entry_dragging = new EventTrigger.Entry();
             EventTrigger.Entry entry_end = new EventTrigger.Entry();
 
-            entry.eventID = EventTriggerType.PointerDown;
+            //entry.eventID = EventTriggerType.PointerDown;
+            entry.eventID = EventTriggerType.Drag;
             entry_dragging.eventID = EventTriggerType.Drag;
             entry_end.eventID = EventTriggerType.EndDrag;
 
