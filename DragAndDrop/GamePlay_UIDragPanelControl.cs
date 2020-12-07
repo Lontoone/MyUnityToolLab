@@ -77,9 +77,9 @@ public class GamePlay_UIDragPanelControl : MonoBehaviour
         GamePlay_FingerControler.OnTouched -= Gragging;
     }
 
-    public void Gragging(Vector2 _goal, bool isDragging)
+    public void Gragging(Vector2 _goal)
     {
-        if (!isDragging || graggingObj == null) { return; }
+        if ( graggingObj == null) { return; }
 
         Vector3 _move = new Vector3(
                         graggingObj.transform.position.x,

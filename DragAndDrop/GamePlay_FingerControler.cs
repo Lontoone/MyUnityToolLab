@@ -6,7 +6,7 @@ using System;
 //管理遊玩畫面的手指操作
 public class GamePlay_FingerControler : MonoBehaviour
 {
-    public static event Action<Vector2, bool> OnTouched;
+    public static event Action<Vector2> OnTouched;
     //bool isDraggingUI = true;
 
     private void Update()
@@ -16,7 +16,7 @@ public class GamePlay_FingerControler : MonoBehaviour
         { 
             if (OnTouched != null)
             {
-                OnTouched(Input.touches[0].position, isDraggingUI);
+                OnTouched(Input.touches[0].position);
             }
             else
             {
@@ -36,7 +36,7 @@ public class GamePlay_FingerControler : MonoBehaviour
             if (OnTouched != null)
             {
                 Debug.Log(Input.mousePosition);
-                OnTouched(Input.mousePosition, true);
+                OnTouched(Input.mousePosition);
             }
         }
 #endif
