@@ -185,7 +185,7 @@ public class PathFinder : MonoBehaviour
             else
             {
                 previous_split_normal = Vector3.zero;
-                
+
                 //檢查下個點是否浮空
                 Vector3 _next = new Vector3();
                 Vector3 nextStop = start + dir.normalized * stepWidth;
@@ -234,18 +234,16 @@ public class PathFinder : MonoBehaviour
             //最高跳點
             Vector3 max_jump_point = hit;
             max_jump_point.y += jumpHeight;
-            /*
+            
             Vector3 toJumpTop = max_jump_point - start;
             //斜邊長
             float rayLength = Mathf.Pow(
                     Mathf.Pow(Vector3.Distance(hit, start), 2) + Mathf.Pow(max_jump_point.y, 2),
-                    0.5f);
+                    0.5f) +1;
 
             //最高跳點有牆壁
-            //Debug.DrawRay(start, toJumpTop.normalized, Color.yellow, 5);
-            //if (Physics.Raycast(start, toJumpTop.normalized, rayLength))
-            */
-            if (Physics.CheckSphere(max_jump_point, 0.5f))//用ray測的hit point會剛好卡在牆裡面 半徑數值先亂抓的
+            if (Physics.Raycast(start, toJumpTop.normalized, rayLength))
+            //if (Physics.CheckSphere(max_jump_point, 0.5f))//半徑數值先亂抓的
             {
                 nextPos = Vector3.zero; //null 失敗
                 Debug.Log("無法跳躍的牆");
