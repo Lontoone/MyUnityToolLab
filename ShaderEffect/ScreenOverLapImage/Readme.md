@@ -1,2 +1,1 @@
-Effect:
-[![Effect preview](https://youtu.be/Y70y_y9MnY0)]
+[demo video](https://youtu.be/Y70y_y9MnY0)
