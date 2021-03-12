@@ -2,6 +2,8 @@
 
 Androind and PC supported.  (I can't test IOS because I don't have one. XD)
 
+For WebGL: please set canvas size as big as the output resolution.
+
 demo
 
 ![image](https://i.imgur.com/TFHXw8i.gif)
