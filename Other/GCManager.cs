@@ -22,7 +22,7 @@ public class GCManager : MonoBehaviour
         if (!dicts.TryGetValue(_key, out _out))
         {
             dicts.Add(_key, new LinkedList<object>());
-            dicts[_key].AddFirst(_obj);            
+            dicts[_key].AddFirst(_obj);
 
             (_obj as GameObject).SetActive(false);
             Debug.Log("current dict count " + dicts.Count);
@@ -71,7 +71,9 @@ public class GCManager : MonoBehaviour
     public static void Destory(string _key, GameObject obj)
     {
         obj.SetActive(false);
-        dicts[_key].Remove(obj);
+        //dicts[_key].Remove(obj);
+        LinkedListNode<object> to_remove_obj = dicts[_key].Find(obj);
+        dicts[_key].Remove(to_remove_obj);
         dicts[_key].AddFirst(obj);
 
     }
