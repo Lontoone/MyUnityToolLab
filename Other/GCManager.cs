@@ -35,7 +35,8 @@ public class GCManager : MonoBehaviour
 
 
     //取得有空閒的物品
-    public static GameObject Instantiate(string _key)
+    public static LinkedListNode<object> Instantiate(string _key)
+   // public static GameObject Instantiate(string _key)
     {
         //檢查該key是否存在
         LinkedList<object> _out;
@@ -51,14 +52,15 @@ public class GCManager : MonoBehaviour
                 dicts[_key].RemoveFirst();
                 dicts[_key].AddLast(first_obj);
 
-                return (first_obj.Value as GameObject);
+                // return (first_obj.Value as GameObject);
+                return first_obj;
             }
 
             //找不到可使用的=>創建新的
             GameObject _newobj = UnityEngine.GameObject.Instantiate((GameObject)dicts[_key].First.Value);
             _newobj.SetActive(true);
-            dicts[_key].AddLast(_newobj);
-            return _newobj;
+            LinkedList<object> newNode = dicts[_key].AddLast(_newobj);
+            return newNode;
 
         }
 
@@ -68,12 +70,14 @@ public class GCManager : MonoBehaviour
 
     }
 
-    public static void Destory(string _key, GameObject obj)
+    public static void Destory(string _key, LinkedListNode<object> node)
     {
+        object obj = node.Value;
         obj.SetActive(false);
-        //dicts[_key].Remove(obj);
-        LinkedListNode<object> to_remove_obj = dicts[_key].Find(obj);
-        dicts[_key].Remove(to_remove_obj);
+        //LinkedListNode<object> to_remove_obj = dicts[_key].Find(obj); 
+        //上面這樣.Find()又要尋找整個Linklist, 
+        //時間依舊O(N), 使用Linkedlist時正確應該是把Node給使用者自行管理
+        dicts[_key].Remove(obj);
         dicts[_key].AddFirst(obj);
 
     }
