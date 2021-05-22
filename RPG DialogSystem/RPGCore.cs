@@ -25,10 +25,10 @@ public class RPGCore
     public const string REGEX_SPLIT_LINES = @"
                                         (?:
                                             (?:
-                                                <(?<tag>/?\w*)(?<arg>[^>]*)>
+                                                <(?<tag>/?\w*)(?<arg> (?(  \(? >?? \)?    ))  \(? .* > .* \) |[^>]* )>
                                                 (?<text>[^<>]*)?
                                             )|
-                                            (?<-tag> </\k<tag>>)+
+                                                (?<-tag> </ \k<tag>>)+
                                         )";
     //拆解參數屬性
     //動畫 (物件名稱,動畫名稱)
@@ -122,7 +122,7 @@ public class RPGCore
         Regex regex = new Regex(REGEX_SPLIT_LINES,
                                             RegexOptions.IgnoreCase
                                            | RegexOptions.Compiled
-                                           | RegexOptions.Singleline
+                                           | RegexOptions.Multiline
                                            | RegexOptions.IgnorePatternWhitespace);
 
 
