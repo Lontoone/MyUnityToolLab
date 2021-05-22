@@ -25,7 +25,7 @@ public class RPGCore
     public const string REGEX_SPLIT_LINES = @"
                                         (?:
                                             (?:
-                                                <(?<tag>/?\w*)(?<arg> (?(  \(? >?? \)?    ))  \(? .* > .* \) |[^>]* )>
+                                                <(?<tag>/?\w*)(?<arg>  \(? .* > .* \) |[^>]* )>
                                                 (?<text>[^<>]*)?
                                             )|
                                                 (?<-tag> </ \k<tag>>)+
