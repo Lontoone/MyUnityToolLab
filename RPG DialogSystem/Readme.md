@@ -58,8 +58,14 @@ Example
 	<opt set("opt"=1) >  dialog content </opt>
  
 	<opt set("opt"=2) > dialog content2 </opt>
+	
+	<if ( a!=1 )>
+	    <opt set("a"=1) > Now you can use if tag in Select! </opt>
+    </if>
  
 	</select>
+	
+*Note you have to init "a" first before using if tag.
 
 ```
 
@@ -130,6 +136,18 @@ EXAMPLE
 Set a variables, or create one if it is not defined.
 
 If variable's name start with`temp_`, then it will be clear out after the dialog end. Otherwise it will last the whole game. Keep in mind that you should write a script to save and load `StoryRecord` in `RPGCore.cs` before you close or open the game.
+
+---
+
+### init
+```
+EXAMPLE
+        init(" temp_a"=1)
+        init("temp_a"= "temp_b")
+        init("temp_a"="temp_b" + "temp_a")
+```
+Basic idea with `set` but it creates and set a variable once.
+Use it with the global dict not the `temp_` dict.
 
 ---
 
