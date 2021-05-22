@@ -20,7 +20,7 @@ I use .xml as file extension only because it is easier to edit on vscode.
 
 -Start by `<story>` and end with `</story>` tag.
 
--<del>Add `\` before `<` and `>` if it is in the content.</del> (New Update: You don't need to add `\` before `<` and `>` in the comparison argument. i.g. <if (a>b)> )
+-<del>Add `\` before `<` and `>` if it is in the content.</del> (New Update: You don't need to add `\` before `<` and `>` in the comparison argument. i.g. <if (a>b) > </if>, but still need to put inside the context.
 ```
 EXAMPLE
 <l > \<color=red\> Red content text! \</color\> </l>
