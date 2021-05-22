@@ -194,10 +194,17 @@ public class StoryReader : MonoBehaviour
                 if (option_btn_prefab != null)
                 {
                     GameObject opt = Instantiate(option_btn_prefab, selectPanel.transform.position, Quaternion.identity, selectPanel.transform);
+                    
+                    //Read Text:
+                    string _opt_text = RPGCore.Put_Back_EscChar(Lines[i].text);
+                    _opt_text = RPGCore.ReadCustomVariables(_opt_text);                    
+
                     opt.name = _opts.Count.ToString();
                     //設定text
                     //opt.GetComponentInChildren<Text>().text = Lines[i].text;
-                    opt.GetComponentInChildren<TextMeshProUGUI>().text = Lines[i].text;
+                    //opt.GetComponentInChildren<TextMeshProUGUI>().text = Lines[i].text;
+                    opt.GetComponentInChildren<TextMeshProUGUI>().text = _opt_text;
+                    
                     Debug.Log(line_index + " " + "TAG " + tag + Lines[i].args + " " + Lines[i].text);
 
                 }
