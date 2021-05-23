@@ -63,7 +63,7 @@ Example
 	    <opt set("a"=1) > Now you can use if tag in Select! </opt>
     </if>
  
-	</select>
+</select>
 	
 *Note you have to init "a" first before using if tag.
 
@@ -183,6 +183,44 @@ WON'T WORK
 ### enable| disable (obj1,obj2,obj3....)
 
 Enable or disable gameobjects. 
+
+---
+
+### How to communicate with C#?
+
+```
+EXAMPLE in story file:
+
+    <l set("temp_hp_cost"= "basePrice" *1.5) set("temp_buy_res" =0)> Do you want to pay $[temp_hp_cost] ? </l>
+
+    <select> 
+        <opt set("temp_buy"=hp) buy(hp) set("temp_buy_res" =1)> Buy Health.</opt>
+    </select>
+
+
+    Buy Failed
+    <if (temp_buy_res ==0) >
+        <l> Buy it when you have money!! </l>
+    </if>
+
+
+```
+
+```
+EXAMPLE in StoryReader.cs custom function: 
+
+if (functionName == "buy"){
+	if (bought_item.Equals("hp")){
+		int _cost = int.Parse(RPGCore.temp_StoryRecord["temp_hp_cost"]);
+		if(money > _cose){
+			//Do Heal~
+		}
+		else{
+			RPGCore.temp_StoryRecord["temp_buy_res"] = "0";
+		}
+	}
+}
+```
 
 ---
 
