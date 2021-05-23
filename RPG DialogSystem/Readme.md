@@ -210,7 +210,7 @@ EXAMPLE in story file:
 EXAMPLE in StoryReader.cs custom function: 
 
 if (functionName == "buy"){
-	if (bought_item.Equals("hp")){
+	if ( paras[0].Equals("hp")){
 		int _cost = int.Parse(RPGCore.temp_StoryRecord["temp_hp_cost"]);
 		if(money > _cose){
 			//Do Heal~
@@ -221,6 +221,8 @@ if (functionName == "buy"){
 	}
 }
 ```
+
+You can use temp Dict or global dict.
 
 ---
 
