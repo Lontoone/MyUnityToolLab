@@ -105,12 +105,16 @@ public class ActionController : MonoBehaviour
                     currentAction.action.Invoke();
                 yield return new WaitForSeconds(currentAction.duration);
             }
+            /*
             //各自進行冷卻
             Debug.Log("計算冷卻 " + currentAction.description);
             StartCoroutine(currentAction.ResetLock());
+            */
 
             //執行完
             Debug.Log("Action Done: " + currentAction.description);
+            if (currentAction.callbackEvent != null)
+                currentAction.callbackEvent.Invoke();
             //currentAction = null;
 
 
@@ -124,14 +128,10 @@ public class ActionController : MonoBehaviour
     }
 
     //檢查用
+    /*
     private void FixedUpdate()
     {
-        /*
-                //檢查time Out
-                if (cTimeOutCheck == null && actionQueue.Count > 0)
-                {
-                    cTimeOutCheck = StartCoroutine(CheckTimeOut());
-                }*/
+       
         if (!isVisiable) { return; }
         if (cDoProcess == null && actionQueue.Count > 0)
         {
@@ -144,14 +144,15 @@ public class ActionController : MonoBehaviour
             if (eActionQueueCleared != null)
                 eActionQueueCleared();
         }
-
-
     }
+
+    */
     public void AddAction(mAction _newAct)
     {
         if (!allowDuplicate)
         {
-            if (_newAct == null || _newAct.is_in_gap_time_lock || actionQueue.Contains(_newAct))
+            //if (_newAct == null || _newAct.is_in_gap_time_lock || actionQueue.Contains(_newAct))
+            if (_newAct == null || _newAct.CheckCoolTime() || actionQueue.Contains(_newAct))
             {
                 //Debug.Log(_newAct.description + " 還在冷卻");
                 return;
@@ -180,19 +181,7 @@ public class ActionController : MonoBehaviour
             return;
         }
 
-        /*
-        //與queue第一項比較排序
-        if (actionQueue.Count > 1 && actionQueue[0].priority < _newAct.priority)
-        {
-            //mAction _temp=actionQueue[0];
-            //交換
-            actionQueue.Add(actionQueue[0]);
-            actionQueue[0] = _newAct;
-        }*/
-
         actionQueue.Add(_newAct);
-        //actionQueue.Sort((a, b) => b.priority.CompareTo(a.priority));
-        //actionQueue.Sort();
 
         if (cDoProcess == null)
         {
@@ -216,7 +205,7 @@ public class ActionController : MonoBehaviour
 
 
     [System.Serializable]
-    public class mAction 
+    public class mAction
     {
         public mAction() { }
         /// <param name="_des">描述.</param>
@@ -258,11 +247,14 @@ public class ActionController : MonoBehaviour
         public float gap_time = 0.5f;
         //public Action action;
         public UnityEngine.Events.UnityEvent action;
+        public UnityEngine.Events.UnityEvent callbackEvent;
         public int priority = 0;//優先度
         public bool force = false; //可以斷別人?
         public float duration; //執行時間
         public bool isLoop = true;
         public float timeOut; //排隊超過時間就刪除
+        double called_time; //使用的now毫秒
+
         [HideInInspector]
         public float time_out_counter = 0; //計時用的，在進入佇列時更新
         public IEnumerator ResetLock()
@@ -272,6 +264,18 @@ public class ActionController : MonoBehaviour
             yield return new WaitForSeconds(gap_time);
             Debug.Log(description + " 冷卻結束");
             is_in_gap_time_lock = false;
+        }
+
+        public bool CheckCoolTime() {
+            //檢查目前時間是否超過冷卻時間
+            if (DateTime.Now.Millisecond - called_time > gap_time)
+            {
+                is_in_gap_time_lock = false;                
+            }
+            else {
+                is_in_gap_time_lock = true;
+            }
+            return is_in_gap_time_lock;
         }
 
     }
