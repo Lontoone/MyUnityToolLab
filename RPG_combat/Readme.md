@@ -1,15 +1,16 @@
 # ActionController.cs
-	A tool to sort action.
+A tool to sort action.
 
 ## How To Use
-	Make it a component of a gameobject. And for example, have a PlayerControl script to declear some actions.
-	![example Image](https://i.imgur.com/sZoD8UC.png)
+
+Make it a component of a gameobject. And for example, have a PlayerControl script to declear some actions.
+![example Image](https://i.imgur.com/sZoD8UC.png)
 	
-	In this example project, I have decleared 16 actions on `PlayerControl.cs`. 
+In this example project, I have decleared 16 actions on `PlayerControl.cs`. 
 	
-	Each mAction class contains these properties.
-	example:
-	![example Image](https://i.imgur.com/LztlBZl.png)
+Each mAction class contains these properties.
+example:
+![example Image](https://i.imgur.com/LztlBZl.png)
 	
 
 ### Propreties
