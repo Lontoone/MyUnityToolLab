@@ -113,8 +113,8 @@ public class ActionController : MonoBehaviour
 
             //執行完
             Debug.Log("Action Done: " + currentAction.description);
-            if (currentAction.callbackEvent != null)
-                currentAction.callbackEvent.Invoke();
+            currentAction.callbackEvent?.Invoke();
+
             //currentAction = null;
 
 
@@ -169,6 +169,8 @@ public class ActionController : MonoBehaviour
             _newAct.force)
         {
             Debug.Log(_newAct.description + " 斷 " + currentAction.description);
+            //做Callback:
+            currentAction.callbackEvent?.Invoke();
             //先終止，加入後再重啟
             StopCoroutine(cDoProcess);
             currentAction.is_in_gap_time_lock = false;
@@ -203,6 +205,10 @@ public class ActionController : MonoBehaviour
         cTimeOutCheck = null;
     }
 
+    public void ClearCurrent()
+    {
+        currentAction = null;
+    }
 
     [System.Serializable]
     public class mAction
@@ -266,13 +272,15 @@ public class ActionController : MonoBehaviour
             is_in_gap_time_lock = false;
         }
 
-        public bool CheckCoolTime() {
+        public bool CheckCoolTime()
+        {
             //檢查目前時間是否超過冷卻時間
             if (DateTime.Now.Millisecond - called_time > gap_time)
             {
-                is_in_gap_time_lock = false;                
+                is_in_gap_time_lock = false;
             }
-            else {
+            else
+            {
                 is_in_gap_time_lock = true;
             }
             return is_in_gap_time_lock;
