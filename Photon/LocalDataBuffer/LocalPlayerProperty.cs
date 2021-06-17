@@ -11,7 +11,7 @@ public class LocalPlayerProperty
     public Dictionary<string, object> playerProperty = new Dictionary<string, object>();
     public void SetProperty(string _key, object _data, bool _useUpdate = true)
     {
-        Player _playerData = GetValue<Player>("Player");
+        Player _playerData = GetValue<Player>(CustomPropertyCode.PLAYER);
 
         if (playerProperty.ContainsKey(_key))
         {
