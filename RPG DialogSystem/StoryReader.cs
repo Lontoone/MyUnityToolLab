@@ -186,18 +186,56 @@ public class StoryReader : MonoBehaviour
             int select_start_index = line_index;
             line_index++;
 
-            //在選單創建選項 (tag=opt)
+            int if_start_index = 0;
+
+            //在選單創建選項 (tag: opt)
             Debug.Log("select end line " + Lines[select_start_index].endLine);
             List<RPGCore.Line> _opts = new List<RPGCore.Line>();
             for (int i = line_index; i < Lines[select_start_index].endLine;)
             {
                 if (option_btn_prefab != null)
                 {
+
+                    //Read Text:
+                    string _opt_text = RPGCore.Put_Back_EscChar(Lines[i].text);
+                    _opt_text = RPGCore.ReadCustomVariables(_opt_text);
+
+
+                    if (Lines[i].tag == "if")
+                    {
+                        //紀錄if開始位置
+                        if_start_index = i;
+
+                        if (!RPGCore.if_compare(Lines[i].args))
+                        {
+                            //skip this opt
+                            i = Lines[i].endLine + 1;
+                            continue;
+                        }
+                        else
+                        {
+                            i = i + 1;
+
+                            //Read Text:
+                            _opt_text = RPGCore.Put_Back_EscChar(Lines[i].text);
+                            _opt_text = RPGCore.ReadCustomVariables(_opt_text);
+
+                        }
+                    }
+                    else if (Lines[i].tag == "/if")
+                    {
+                        i = Lines[if_start_index].endLine + 1;
+                        continue;
+                    }
+
+
                     GameObject opt = Instantiate(option_btn_prefab, selectPanel.transform.position, Quaternion.identity, selectPanel.transform);
                     opt.name = _opts.Count.ToString();
-                    //設定text
-                    //opt.GetComponentInChildren<Text>().text = Lines[i].text;
-                    opt.GetComponentInChildren<TextMeshProUGUI>().text = Lines[i].text;
+
+                    //設定text                    
+                    //opt.GetComponentInChildren<TextMeshProUGUI>().text = Lines[i].text;
+                    opt.GetComponentInChildren<TextMeshProUGUI>().text = _opt_text;
+
                     Debug.Log(line_index + " " + "TAG " + tag + Lines[i].args + " " + Lines[i].text);
 
                 }
@@ -222,6 +260,7 @@ public class StoryReader : MonoBehaviour
             UpdateDialog();
         }
 
+
         //if 條件式
         //  true=> 跳至下一行
         //  false=> 跳至endline+1
@@ -241,6 +280,7 @@ public class StoryReader : MonoBehaviour
         else if (tag.StartsWith("/")) //FOR:[bug] if、select結尾後沒有其他段落會直接跳到story tag後解讀失敗
         {
 
+            //line_index++;
             forceEnd = true;
         }
         else
@@ -380,8 +420,59 @@ public class StoryReader : MonoBehaviour
 
         }
 
+        //Init
+        foreach (Match match in GetMatch(args, RPGCore.REGEX_ARGS_INIT))
+        {
+            Debug.Log("Init");
+            string _key = Regex.Replace(match.Groups["key"].Value, @"['""]", ""); ;
+            string _value = match.Groups["value"].Value;
+            string _operator = match.Groups["operator"].Value; //optional
+            string _value2 = match.Groups["value2"].Value; //optional
 
-        //其他 用括號的參數改用統一regex拆解 other
+            //判斷value是字典key或值
+            bool v1_is_key = Regex.IsMatch(_value, @"['""].*?['""]");
+            bool v2_is_key = Regex.IsMatch(_value2, @"['""].*?['""]");
+
+            string v1 = _value, v2 = _value2;
+
+            bool key_is_inDict = false;
+            RPGCore.GetDictValue(_key, out key_is_inDict);
+            //已經在字典裡就不用設值
+            if (key_is_inDict)
+            {
+                return;
+            }
+
+
+            if (v1_is_key)
+                v1 = RPGCore.GetDictValue(Regex.Replace(_value, @"['""]", ""));
+            if (v2_is_key)
+                v2 = RPGCore.GetDictValue(Regex.Replace(_value2, @"['""]", ""));
+
+            //先做運算
+            if (_operator != "")
+            {
+                int v1_num = int.Parse(v1);
+                int v2_num = int.Parse(v2);
+                if (_operator == "+")
+                    RPGCore.SetDictionaryValue(_key, (v1_num + v2_num).ToString());
+                if (_operator == "-")
+                    RPGCore.SetDictionaryValue(_key, (v1_num - v2_num).ToString());
+                if (_operator == "*")
+                    RPGCore.SetDictionaryValue(_key, (v1_num * v2_num).ToString());
+                if (_operator == "/")
+                    RPGCore.SetDictionaryValue(_key, (v1_num / v2_num).ToString());
+            }
+            else
+            {
+                //不做運算直接給值
+                RPGCore.SetDictionaryValue(_key, v1);
+            }
+
+        }
+
+
+        //其他 (可刪除，或去補齊方法cs檔): 用括號的參數改用統一regex拆解
         foreach (Match match in GetMatch(args, RPGCore.REGEX_FUNC_PARA))
         {
             //方法名稱
@@ -409,6 +500,7 @@ public class StoryReader : MonoBehaviour
             }
 
             //**************** YOUR OWN SCRIPT FUNCTION *****************************
+           
             //changeScene(scenetoLoad ) 換場景
             if (functionName == "changeScene")
             {
@@ -417,6 +509,8 @@ public class StoryReader : MonoBehaviour
                 SceneManager.LoadScene(scene_to_load);
             }
 
+
+         
         }
         #endregion
     }
@@ -426,9 +520,10 @@ public class StoryReader : MonoBehaviour
         string side = paras[0];
         string path = paras[1];
         string effect = (paras.Length > 2) ? paras[2] : "";
+        //??這樣有比較好??
         SetPortraitImg(side, path);
     }
-    //設定大頭照 dialog image
+    //設定大頭照
     void SetPortraitImg(string side, string imgPath)
     {
         Sprite pic = Resources.Load<Sprite>(imgPath);
@@ -467,10 +562,10 @@ public class StoryReader : MonoBehaviour
     public void ReadText(string text)
     {
         if (dialogText != null)
-        { 
-            //放回跳脫字元 put back Escape character
+        {
+            //放回跳脫字元
             text = RPGCore.Put_Back_EscChar(text);
-            //自定義變數 custom variables
+            //自定義變數
             text = RPGCore.ReadCustomVariables(text);
 
             dialogText.text = text;
@@ -478,11 +573,11 @@ public class StoryReader : MonoBehaviour
 
     }
 
-    //按鈕回傳 select button return
+    //按鈕回傳
     public static void ReturnInput(string _input)
     {
         input = _input;
     }
 
-  
+   
 }

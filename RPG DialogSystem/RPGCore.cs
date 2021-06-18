@@ -25,10 +25,10 @@ public class RPGCore
     public const string REGEX_SPLIT_LINES = @"
                                         (?:
                                             (?:
-                                                <(?<tag>/?\w*)(?<arg>[^>]*)>
+                                                <(?<tag>/?\w*)(?<arg>  \(? .* > .* \) |[^>]* )>
                                                 (?<text>[^<>]*)?
                                             )|
-                                            (?<-tag> </\k<tag>>)+
+                                                (?<-tag> </ \k<tag>>)+
                                         )";
     //拆解參數屬性
     //動畫 (物件名稱,動畫名稱)
@@ -80,6 +80,17 @@ public class RPGCore
                                         (?<value2>['"".]*\w+['"".]*)
                                         )?";
 
+ //init("a"=b)
+    public const string REGEX_ARGS_INIT = @"
+                                        init\s*\(\s*
+                                        ['"".]*
+                                        (?<key>['""]+[\w\s]+['""]+)['""\s]*=\s*
+                                        (?<value>['"".]*[\w\s]+['"".]*)\s*
+                                        (?:
+                                        \s*(?<operator>[-*+=]+)\s*
+                                        (?<value2>['"".]*\w+['"".]*)
+                                        )?";
+
     //音樂 audio(objectName, [play|pause|stop])
     public const string REGEX_ARGS_AUDIO = @"audio\s*\(\s*
                                                 ['"".]*
@@ -122,7 +133,7 @@ public class RPGCore
         Regex regex = new Regex(REGEX_SPLIT_LINES,
                                             RegexOptions.IgnoreCase
                                            | RegexOptions.Compiled
-                                           | RegexOptions.Singleline
+                                           | RegexOptions.Multiline
                                            | RegexOptions.IgnorePatternWhitespace);
 
 

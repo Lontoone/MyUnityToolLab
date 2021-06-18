@@ -20,7 +20,7 @@ I use .xml as file extension only because it is easier to edit on vscode.
 
 -Start by `<story>` and end with `</story>` tag.
 
--Add `\` before `<` and `>` if it is in the content.
+-<del>Add `\` before `<` and `>` if it is in the content.</del> (New Update: You don't need to add `\` before `<` and `>` in the comparison argument. i.g. <if (a>b) > </if>, but still need to put inside the context.
 ```
 EXAMPLE
 <l > \<color=red\> Red content text! \</color\> </l>
@@ -58,8 +58,14 @@ Example
 	<opt set("opt"=1) >  dialog content </opt>
  
 	<opt set("opt"=2) > dialog content2 </opt>
+	
+	<if ( a!=1 )>
+	    <opt set("a"=1) > Now you can use if tag in Select! </opt>
+    </if>
  
-	</select>
+</select>
+	
+*Note you have to init "a" first before using if tag.
 
 ```
 
@@ -133,6 +139,18 @@ If variable's name start with`temp_`, then it will be clear out after the dialog
 
 ---
 
+### init
+```
+EXAMPLE
+        init(" temp_a"=1)
+        init("temp_a"= "temp_b")
+        init("temp_a"="temp_b" + "temp_a")
+```
+Basic idea with `set` but it creates and set a variable once.
+Use it with the global dict not the `temp_` dict.
+
+---
+
 ### $[]
 Read a variable's value.
 ```
@@ -165,6 +183,46 @@ WON'T WORK
 ### enable| disable (obj1,obj2,obj3....)
 
 Enable or disable gameobjects. 
+
+---
+
+### How to communicate with C#?
+
+```
+EXAMPLE in story file:
+
+    <l set("temp_hp_cost"= "basePrice" *1.5) set("temp_buy_res" =0)> Do you want to pay $[temp_hp_cost] ? </l>
+
+    <select> 
+        <opt set("temp_buy"=hp) buy(hp) set("temp_buy_res" =1)> Buy Health.</opt>
+    </select>
+
+
+    Buy Failed
+    <if (temp_buy_res ==0) >
+        <l> Buy it when you have money!! </l>
+    </if>
+
+
+```
+
+```
+EXAMPLE in StoryReader.cs custom function: 
+
+if (functionName == "buy"){
+	if ( paras[0].Equals("hp")){
+		int _cost = int.Parse(RPGCore.temp_StoryRecord["temp_hp_cost"]);
+		if(money > _cose){
+			//Do Heal~
+		}
+		else{
+			RPGCore.temp_StoryRecord["temp_buy_res"] = "0";
+		}
+	}
+}
+```
+
+You can use temp Dict or global dict.
 
 ---
 
