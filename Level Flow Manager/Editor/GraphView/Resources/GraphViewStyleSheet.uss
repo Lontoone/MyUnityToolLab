@@ -1,0 +1,37 @@
+﻿VisualElement {
+}
+
+
+GridBackground{
+	--grid-background-color: #282828;
+	--line-color: rgba(193,192,0.1);
+	--thick-line-color:rgba(193,196,192,0.025);
+	--spacing:25;
+
+}
+
+#node-border{
+	/*background-color:#333333;*/
+}
+
+.subViewBox{
+	height:250px;
+	width:250px;
+	margin-left:50px;
+	margin-right:50px;
+	margin-top:25px;
+	margin-bottom:25px;
+}
+.subViewBox Port{
+	flex-wrap:wrap-reverse;	
+	background-color:#333333;
+}
+.subViewBox Port Label{
+	max-width:10px;
+}
+
+.nameOfDialogeContainer_lable{
+	margin-top :3px;
+	margin-left: 5px;
+	padding-right :5 px;
+}
