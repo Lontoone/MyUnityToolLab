@@ -13,9 +13,13 @@ public class HitableObj : MonoBehaviour
     public bool isDead = false;
     public bool isHitable = true;
 
+    public float hitInterval = 0.5f;
+    private float lastHurtTime = 0;
+
     private void Start()
     {
         Hit_event += Hit;
+        lastHurtTime = Time.time;
     }
     private void OnDestroy()
     {
@@ -34,6 +38,16 @@ public class HitableObj : MonoBehaviour
     {
         if (target == gameObject)
         {
+            //冷卻
+            if (Time.time - lastHurtTime > hitInterval)
+            {
+                lastHurtTime = Time.time;
+            }
+            else
+            {
+                return;
+            }
+
             Debug.Log(gameObject.name + " 受到 " + damage + " 傷害");
 
             if (isHitable)
