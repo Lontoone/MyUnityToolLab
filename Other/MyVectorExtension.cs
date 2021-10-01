@@ -35,6 +35,7 @@ public static class MyVectorExtension
     /// <summary>
     /// Predicts each setp's position of adding a force on the rigidbody.
     /// Can use it to draw points of a projectail line.
+    /// 預測拋物線路徑
     /// </summary>
     /// <param name="rigidbody"></param>
     /// <param name="originForce">start position</param>
@@ -62,6 +63,13 @@ public static class MyVectorExtension
 
 
     //3D
+    /// <summary>
+    /// 將vec投影在XY軸上取得夾角
+    /// </summary>
+    /// <param name="vec"></param>
+    /// <param name="projectAxisX"></param>
+    /// <param name="projectAxisY"></param>
+    /// <returns></returns>
     public static float ProjectAngle(Vector3 vec, Vector3 projectAxisX, Vector3 projectAxisY)
     {
         float _mouseProjectedX = Vector3.Dot(vec, projectAxisX);
@@ -70,6 +78,13 @@ public static class MyVectorExtension
         return Mathf.Atan2(_mouseProjectedY, _mouseProjectedX) * Mathf.Rad2Deg;
     }
 
+    /// <summary>
+    /// 取得對稱3D拋物線路徑
+    /// </summary>
+    /// <param name="v0">初速度</param>
+    /// <param name="startPos"></param>
+    /// <param name="steps"></param>
+    /// <returns></returns>
     public static Vector3[] ProjectilePlots(Vector3 v0, Vector3 startPos, int steps)
     {
         Vector3[] result = new Vector3[steps];
@@ -84,6 +99,15 @@ public static class MyVectorExtension
 
         return result;
     }
+    /// <summary>
+    /// 取得拋物線路徑直到endY高度並回傳總共的seg數量
+    /// </summary>
+    /// <param name="v0"></param>
+    /// <param name="startPos"></param>
+    /// <param name="gapDist">each distance between seg. 每段seg距離</param>
+    /// <param name="endY"></param>
+    /// <param name="segCount"></param>
+    /// <returns></returns>
     public static Vector3[] ProjectilePlots(Vector3 v0, Vector3 startPos, float gapDist, float endY, out int segCount)
     {
         segCount = 1;
@@ -104,6 +128,13 @@ public static class MyVectorExtension
         return results.ToArray();
 
     }
+    /// <summary>
+    /// 計算從start位置以初速度v0幾秒後的位置
+    /// </summary>
+    /// <param name="vo"></param>
+    /// <param name="startPos"></param>
+    /// <param name="time"></param>
+    /// <returns></returns>
     public static Vector3 CalculatePosInTime(Vector3 vo, Vector3 startPos, float time)
     {
         Vector3 vxz = vo;
@@ -116,6 +147,13 @@ public static class MyVectorExtension
         return result;
     }
 
+    /// <summary>
+    /// 輸入目標位置、起點與發射夾角，取得所需所需速度
+    /// </summary>
+    /// <param name="targetPosition"></param>
+    /// <param name="startPos"></param>
+    /// <param name="degAngle"></param>
+    /// <returns></returns>
     public static Vector3 GetProjectileShootVelocity(Vector3 targetPosition, Vector3 startPos, float degAngle)
     {
         Vector3 p = targetPosition;

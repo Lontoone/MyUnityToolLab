@@ -19,7 +19,7 @@ public class GCManager : MonoBehaviour
 {
     static Dictionary<string, LinkedList<object>> s_m_dicts = new Dictionary<string, LinkedList<object>>();
     static Dictionary<object, LinkedListNode<object>> s_m_nodes = new Dictionary<object, LinkedListNode<object>>();
-    static Dictionary<string, Vector2> s_m_registerScale = new Dictionary<string, Vector2>();
+    static Dictionary<string, Vector3> s_m_registerScale = new Dictionary<string, Vector3>();
 
     static int _db_c = 0;
     public static void RegisterObject(string _key, object _obj)
@@ -44,7 +44,7 @@ public class GCManager : MonoBehaviour
         }
     }
 
-    public static T Instantiate<T>(string _key, Transform parent = null, Vector2 position = default, GameObject prefab = null)
+    public static T Instantiate<T>(string _key, Transform parent = null, Vector3 position = default, GameObject prefab = null) where T:class
     {
         T _res;
         LinkedListNode<object> _node = InstantiateNode(_key, parent, position, prefab);
@@ -52,13 +52,14 @@ public class GCManager : MonoBehaviour
         if (s_m_nodes.TryGetValue(_node.Value, out _oldNode))
         {
             s_m_nodes[_node.Value] = _node;
-            _res = (T)_node.Value;
+            _res =( _node.Value as GameObject).GetComponent<T>();
             return _res;
         }
         else
         {
             s_m_nodes.Add(_node.Value, _node);
-            _res = (T)_node.Value;
+            //_res = (T)_node.Value;
+            _res = (_node.Value as GameObject).GetComponent<T>();
             return _res;
         }
     }
