@@ -2,18 +2,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.Experimental.GraphView;
+using System.IO;
+//using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [CreateAssetMenu(menuName = "Level/LevelFlow")]
 public class LevelMapSO : ScriptableObject
 {
-    public SceneAsset mainScene;
-    [HideInInspector]
+    //public SceneAsset mainScene;
+    //public Scene mainScene;
+    public string mainSceneName;
+
+    //[HideInInspector]
     public List<StartNodeData> startNodeDatas = new List<StartNodeData>();
-    [HideInInspector]
+    //[HideInInspector]
     public List<LevelNodeData> levelNodeDatas = new List<LevelNodeData>();
-    [HideInInspector]
+    //[HideInInspector]
     public List<PortSet> allPortSets
     {
         get
@@ -74,14 +79,22 @@ public class LevelNodeData : BaseNodeData
     public List<PortSet> portSets = new List<PortSet>();
     public SceneLoadType loadType = new SceneLoadType();
     public AsyncLoadType asyncType = new AsyncLoadType();
+    public string scenePath;
     public string sceneAssestGuid;
-    public string GetScenePath() {
-        return AssetDatabase.GUIDToAssetPath(sceneAssestGuid);
+    public string GetScenePath()
+    {
+#if UNITY_EDITOR
+        //return SceneManager.GetSceneByPath
+        //return AssetDatabase.GUIDToAssetPath(sceneAssestGuid);
+        return scenePath;
+#else
+        return scenePath;
+#endif
     }
+    /*
     public SceneAsset GetSceneAsset() {
         return AssetDatabase.LoadAssetAtPath<SceneAsset>(GetScenePath());
-    }
-    //TODO: load type  
+    }*/
 
 }
 [System.Serializable]

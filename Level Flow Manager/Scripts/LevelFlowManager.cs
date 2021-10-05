@@ -6,10 +6,18 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEditor;
 using System.Threading.Tasks;
+using System.IO;
+
+//TODO: Load all Scene
+//TODO: OnConnectPointEntered event not working
+//TODO: Unload scenes except current and main
+//TODO: [Bug]Edge breaks when sceneUpdated
+//TODO: More API?
 
 public class LevelFlowManager
 {
     public static LevelMapSO flowData;
+    //public static event Action<string> OnLevelEntered;
     private static string loadingScene;
     public static event Action<string> OnConnectPointEntered;
     private static bool load_isDone = false;
@@ -84,50 +92,63 @@ public class LevelFlowManager
     }
     private static async void LoadSceneSync(string _scenePath, string _nextGuid, SceneLoadType _type)
     {
-        SceneAsset _sceneToLoad = AssetDatabase.LoadAssetAtPath<SceneAsset>(_scenePath);     
-        
+#if UNITY_EDITOR
+        //SceneAsset _sceneToLoad = AssetDatabase.LoadAssetAtPath<SceneAsset>(_scenePath);
+        string _sceneToLoad = Path.GetFileNameWithoutExtension(_scenePath);
+#else
+        string _sceneToLoad = Path.GetFileNameWithoutExtension(_scenePath);  
+#endif
         if (SceneManager.GetSceneByPath(_scenePath).isLoaded || _scenePath == loadingScene)
         {
-            Debug.Log(_sceneToLoad.name + "  is Loaded");
+            Debug.Log(_sceneToLoad + "  is Loaded");
             return;
         }
-        
 
-        Debug.Log("Sync Load Scene -name: " + _sceneToLoad.name);
+
+        Debug.Log("Sync Load Scene -name: " + _sceneToLoad);
         if (_type == SceneLoadType.Additive)
         {
-            SceneManager.LoadScene(_sceneToLoad.name, LoadSceneMode.Additive);
+            SceneManager.LoadScene(_sceneToLoad, LoadSceneMode.Additive);
             InvokeEnterPoint(_nextGuid);
         }
         else if (_type == SceneLoadType.Single)
         {
-            if (flowData.mainScene != null)
+            //有固定場景時
+
+            if (flowData.mainSceneName != "")
             {
-                AsyncUnloadAllScenesExcept(flowData.mainScene.name, _sceneToLoad.name);
-                SceneManager.LoadScene(_sceneToLoad.name, LoadSceneMode.Additive);
+                AsyncUnloadAllScenesExcept(flowData.mainSceneName, _sceneToLoad);
+                SceneManager.LoadScene(_sceneToLoad, LoadSceneMode.Additive);
             }
             else
             {
-                SceneManager.LoadScene(_sceneToLoad.name, LoadSceneMode.Single);
+                SceneManager.LoadScene(_sceneToLoad, LoadSceneMode.Single);
             }
+
             InvokeEnterPoint(_nextGuid);
         }
     }
 
     private static async Task LoadSceneAsync(string _scenePath, string _nextGuid, SceneLoadType _type)
     {
-        SceneAsset _sceneToLoad = AssetDatabase.LoadAssetAtPath<SceneAsset>(_scenePath);
+#if UNITY_EDITOR
+        //SceneAsset _sceneToLoad = AssetDatabase.LoadAssetAtPath<SceneAsset>(_scenePath);
+        string _sceneToLoad = Path.GetFileNameWithoutExtension(_scenePath);
+#else
+        string _sceneToLoad = Path.GetFileNameWithoutExtension(_scenePath);  
+#endif
+
         if (SceneManager.GetSceneByPath(_scenePath).isLoaded || loadingScene == _scenePath)
         {
-            Debug.Log(_sceneToLoad.name + "  is Loaded");
+            Debug.Log(_sceneToLoad + "  is Loaded");
             return;
         }
         loadingScene = _scenePath;
 
-        Debug.Log("Load Scene -name: " + _sceneToLoad.name);
+        Debug.Log("Load Scene -name: " + _sceneToLoad);
         if (_type == SceneLoadType.Additive)
         {
-            SceneManager.LoadSceneAsync(_sceneToLoad.name, LoadSceneMode.Additive);
+            SceneManager.LoadSceneAsync(_sceneToLoad, LoadSceneMode.Additive);
             /*
             await WaitForAsyncScene(
                     _sceneToLoad.name,
@@ -137,28 +158,19 @@ public class LevelFlowManager
         }
         else if (_type == SceneLoadType.Single)
         {
+            //[TODO]:有基本場景
             //To keep the main scene, use fake single mode
-            if (flowData.mainScene != null)
+
+            if (flowData.mainSceneName != "")
             {
-                await AsyncUnloadAllScenesExcept(flowData.mainScene.name, _sceneToLoad.name);
-                SceneManager.LoadSceneAsync(_sceneToLoad.name, LoadSceneMode.Additive);
-                /*
-                await WaitForAsyncScene(
-                        _sceneToLoad.name,
-                        LoadSceneMode.Additive,
-                       async delegate { InvokeEnterPoint(_nextGuid); }
-                        );*/
+                await AsyncUnloadAllScenesExcept(flowData.mainSceneName, _sceneToLoad);
+                SceneManager.LoadSceneAsync(_sceneToLoad, LoadSceneMode.Additive);
             }
             else
             {
-                SceneManager.LoadSceneAsync(_sceneToLoad.name, LoadSceneMode.Single);
-                /*
-                await WaitForAsyncScene(
-                       _sceneToLoad.name,
-                       LoadSceneMode.Single,
-                      async delegate { InvokeEnterPoint(_nextGuid); }
-                       );*/
+                SceneManager.LoadSceneAsync(_sceneToLoad, LoadSceneMode.Single);
             }
+
         }
         InvokeEnterPoint(_nextGuid);
     }

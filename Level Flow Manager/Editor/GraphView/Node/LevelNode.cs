@@ -19,6 +19,7 @@ public class LevelNode : BaseNode
     public SceneLoadType loadType = SceneLoadType.Single;
     public object scene;
     public string scenAssetGuid;
+    public string scenePath;
 
     public Label subGraphView;
     private ObjectField sceneField;
@@ -45,6 +46,7 @@ public class LevelNode : BaseNode
             scene = ValueTuple.newValue;
             title = ValueTuple.newValue.name;
             scenAssetGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(ValueTuple.newValue as SceneAsset));
+            scenePath = AssetDatabase.GetAssetPath(ValueTuple.newValue as SceneAsset);
             //SetScenePath();
         });
         mainContainer.Add(sceneField);

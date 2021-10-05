@@ -71,6 +71,7 @@ public class MapSaveLoad
             portSets = _node.portSets,
             loadType = _node.loadType,
             asyncType = _lvnode.asyncType,
+            scenePath = _lvnode.scenePath,
             //scene = _node.scene,
             sceneAssestGuid = _node.scenAssetGuid,
 
@@ -135,6 +136,7 @@ public class MapSaveLoad
             _lvNode.asyncType = _data.asyncType;
             _lvNode.loadType = _data.loadType;
             _lvNode.portSets = _data.portSets;
+            _lvNode.scenePath = _data.scenePath;
             Debug.Log("1. GenerateNodes  port count" + _data.portSets.Count);
             _lvNode.LoadValueIntoField();
 

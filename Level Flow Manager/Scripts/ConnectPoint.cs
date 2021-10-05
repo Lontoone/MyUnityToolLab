@@ -7,7 +7,9 @@ public class ConnectPoint : MonoBehaviour
 {
     //GetInstanceID用變，用posisiton做辨識    
     public LevelMapSO data;
+#if UNITY_EDITOR
     [ReadOnly]
+#endif
     [Tooltip("Make sure id is empty or unique in this scene")]
     public string portSetId;
 
@@ -17,7 +19,8 @@ public class ConnectPoint : MonoBehaviour
     }
 
     [ContextMenu("reset id")]
-    private void ResetPortId() {
+    private void ResetPortId()
+    {
         portSetId = "";
     }
 
