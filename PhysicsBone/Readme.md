@@ -1,6 +1,6 @@
 You can make cloth simulation like this:
 
-![Preview gif](https://i.imgur.com/whXoNLa.gif)
+![pgif](https://i.imgur.com/bnmxhYk.gif)
 
 parameter as follow:
 
