@@ -35,7 +35,7 @@ public class GCManager : MonoBehaviour
             s_m_registerScale.Add(_key, (_obj as GameObject).transform.localScale);
 
             (_obj as GameObject).SetActive(false);
-            Debug.Log("current dict count " + s_m_dicts.Count);
+            //Debug.Log("current dict count " + s_m_dicts.Count);
         }
         else
         {
@@ -82,7 +82,7 @@ public class GCManager : MonoBehaviour
                 s_m_dicts[_key].RemoveFirst();
                 s_m_dicts[_key].AddLast(first_obj);
                 (first_obj.Value as GameObject).transform.SetParent(parent);
-                Debug.Log("GC Get First value " + _db_c.ToString());
+                //Debug.Log("GC Get First value " + _db_c.ToString());
 
                 (first_obj.Value as GameObject).name = _db_c.ToString();
                 _db_c++;
@@ -105,7 +105,7 @@ public class GCManager : MonoBehaviour
             s_m_dicts.Add(_key, new LinkedList<object>());
             LinkedListNode<object> newNode = s_m_dicts[_key].AddLast(_newobj);
             _newobj.SetActive(true);
-            Debug.Log("GC Create prefab");
+            //Debug.Log("GC Create prefab");
             return newNode;
         }
 
@@ -129,7 +129,7 @@ public class GCManager : MonoBehaviour
         //時間依舊O(N), 使用Linkedlist時正確應該是把Node給使用者自行管理
         s_m_dicts[_key].Remove(obj);
         s_m_dicts[_key].AddFirst(obj);
-        Debug.Log("GC回收 " + (obj as GameObject).name);
+        //Debug.Log("GC回收 " + (obj as GameObject).name);
 
     }
 

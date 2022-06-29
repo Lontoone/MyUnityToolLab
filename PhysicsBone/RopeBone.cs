@@ -5,12 +5,14 @@ using UnityEngine;
 //[ExecuteAlways]
 public class RopeBone : MonoBehaviour
 {
-    public Vector3 forceGravity = new Vector3(0f, -1.5f,0);
+    public Vector3 forceGravity = new Vector3(0f, -1f,0);
     public int applyTimes = 3;
-    public float maxStratch = 0.5f;
+    
+    public float mass = 1;
+    public float stiffness = 0.1f;
     [Range(0f,1.0f)]
-    public float friction = 0.9f;
-    public float bounce = 1.15f;
+    public float damping = 0.9f;
+    //public float friction = 0.9f;
     private List<RopePoint> points = new List<RopePoint>();
     private List<Stick> sticks = new List<Stick>();
 
@@ -18,13 +20,15 @@ public class RopeBone : MonoBehaviour
 
     private void Start()
     {
-        //¥[¤Jbone
+        //åŠ å…¥bone
         for (int i = 0; i < bones.Length; i++)
         {
             Vector3 bonePoint = bones[i].transform.position;
-            points.Add(new RopePoint(bonePoint, bones[i]));
+            RopePoint rp = new RopePoint(bonePoint, bones[i]);
+            rp.originLocalPos = transform.InverseTransformPoint(bonePoint);
+            points.Add(rp);
         }
-        //¥[¤Jstick
+        //åŠ å…¥stick
         for (int i = 0; i<points.Count-1;i++) {
             sticks.Add(new Stick( points[i], points[i + 1]));
         }
@@ -41,13 +45,13 @@ public class RopeBone : MonoBehaviour
 
     private void Simulate()
     {
-        // SIMULATION (ºâ¨C­ÓÂIªºvelocity)
+        // SIMULATION (ç®—æ¯å€‹é»žçš„velocity)
         
         for (int i = 0; i < points.Count; i++)
         {
             RopePoint _p = this.points[i];
 
-            //²Ä¤@­ÓÂI
+            //ç¬¬ä¸€å€‹é»ž
             if (i == 0) {
                 _p.posOld = _p.posNow;
                 _p.posNow = _p.boneObject.position;
@@ -56,10 +60,13 @@ public class RopeBone : MonoBehaviour
             }
 
             //## NewPos = CurrPos + (CurrPos - OldPos)
-            Vector3 velocity = (_p.posNow - _p.posOld) *(1-friction);
+            Vector3 force = (_p.posNow - transform.TransformPoint(_p.originLocalPos)) * stiffness ; //èˆ‡åŽŸæœ¬ä½ç½®çš„è£œæ­£
+            Vector3 velocity = (_p.posNow - _p.posOld) *(damping);
+            mass = Mathf.Max(0.01f,mass);
+            velocity = (velocity - force/mass);
             _p.posOld = _p.posNow;
             _p.posNow += velocity;
-            //¤Þ¤O
+            //å¼•åŠ›
             _p.posNow += forceGravity * Time.fixedDeltaTime;
             points[i] = _p;
         }
@@ -81,61 +88,12 @@ public class RopeBone : MonoBehaviour
 
             sticks[i].p0.posNow -= percent * moveDir;
             sticks[i].p1.posNow += percent * moveDir;
-        }
-        /*
-        RopePoint firstSegment = this.points[0];
-        firstSegment.posNow = bones[0].position;
-        this.points[0] = firstSegment;
-
-        int _leng = points.Count;
-
-        RopePoint endSegment = this.points[_leng - 1];
-        endSegment.posNow = bones[_leng - 1].position;
-        this.points[_leng - 1] = endSegment;
-
-        for (int i = 0; i < _leng - 1; i++)
-        {
-            RopePoint firstSeg = points[i];
-            RopePoint secondSeg = points[i + 1];
-            float ropeSegLen = points[i].segLength;
-
-            //©T©w¨âÂI¶¡ªº½u¬qªø«×¡C (¹Lªø=>¤ºÁY ¡A¹Lµu=>¥~®i)
-            float dist = (firstSeg.posNow - secondSeg.posNow).magnitude; //¼ÒÀÀªº³t«× d = p1 - p2
-
-            //s = (restDistance - |d|)/ |d| =1
-            float error = Mathf.Abs(dist - ropeSegLen) ; //¶W¥XÃ·¤l©T©wªø«×ªº½d³ò(¤ñ¨Ò­È d)   
-            Vector3 changeDir = Vector3.zero;
-
-            //¹Lªø
-            if (dist > ropeSegLen)
-            {
-                changeDir = (firstSeg.posNow - secondSeg.posNow).normalized; //Ã·¤l¥~®i¤F¦h¤Ö
-            }
-            //¹Lµu
-            else if (dist < ropeSegLen)
-            {
-                changeDir = (secondSeg.posNow - firstSeg.posNow).normalized; //Ã·¤l¤ºÁY¤F¦h¤Ö
-            }
-            Vector3 changeAmount = changeDir * error ;
-            if (i != 0)
-            {
-                //±N¥~®i©Î¤ºÁYªº­È¤ÀÅu¦bÀY§À³¡
-                firstSeg.posNow -= changeAmount * 0.5f;
-                points[i] = firstSeg;
-                secondSeg.posNow += changeAmount * 0.5f;
-                points[i + 1] = secondSeg;
-            }
-            else
-            {
-                secondSeg.posNow += changeAmount;
-                points[i + 1] = secondSeg;
-            }            
-        }*/
+        }        
     }
 
     private void DrawRope()
     {
-        //©T©w²Ä¤@­Ó
+        //å›ºå®šç¬¬ä¸€å€‹
         for (int i = 1; i < points.Count; i++)
         {
             points[i].boneObject.position = points[i].posNow;
@@ -165,20 +123,8 @@ public class RopeBone : MonoBehaviour
         public Vector3 posNow;
         public Vector3 posOld;
         public Transform boneObject;
-        //public float segLength;
-        //public Vector3 orginToDir;
-        //public Vector3 originLocalPos;
-        /*
-        public RopeSegment(Vector3 pos, Transform bone, float length, Vector3 fromDir)
-        {
-            this.posNow = pos;
-            this.posOld = pos;
-            boneObject = bone;
-            segLength = length;
-            orginToDir = fromDir;
-            originLocalPos = boneObject.localPosition;
-        }
-        */
+        public Vector3 originLocalPos;
+        
         public RopePoint(Vector3 pos, Transform bone)
         {
             this.posNow = pos;
