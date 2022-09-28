@@ -42,10 +42,10 @@ public static class MyVectorExtension
     /// <param name="velocity"></param>
     /// <param name="steps"></param>
     /// <returns></returns>
-    public static Vector2[] Plot(Rigidbody2D rigidbody, Vector2 originForce, Vector2 velocity, int steps)
+    public static Vector3[] Plot2D(Rigidbody2D rigidbody, Vector2 originForce, Vector2 velocity, int steps)
     {
-        Vector2[] result = new Vector2[steps];
-        float timeStep = Time.fixedDeltaTime / Physics2D.velocityIterations;
+        Vector3[] result = new Vector3[steps];
+        float timeStep = (Time.fixedDeltaTime + 0.1f) / Physics2D.velocityIterations;
         Vector2 gravityAccel = Physics2D.gravity * rigidbody.gravityScale * timeStep * timeStep;
 
         float drag = 1f - timeStep * rigidbody.drag;
@@ -56,12 +56,32 @@ public static class MyVectorExtension
             moveStep += gravityAccel;
             moveStep *= drag;
             originForce += moveStep;
-            result[i] = originForce;
+            result[i] = originForce + (Vector2)rigidbody.transform.position;
         }
         return result;
     }
+    public static List<Vector3> Plot2D(Rigidbody2D rigidbody, Vector2 originForce, Vector2 velocity, float endY, out int steps)
+    {
+        List<Vector3> result = new List<Vector3>();
+        float timeStep = (Time.fixedDeltaTime+0.1f) / Physics2D.velocityIterations;
+        Vector2 gravityAccel = Physics2D.gravity * rigidbody.gravityScale * timeStep * timeStep;
 
+        float drag = 1f - timeStep * rigidbody.drag;
+        Vector2 moveStep = velocity * timeStep;
 
+        Vector2 _currentPos = rigidbody.position;
+        steps = 0;
+        while(_currentPos.y > endY && steps < 100)
+        //for (int i = 0; i < steps; i++)
+        {            
+            moveStep += gravityAccel;
+            moveStep *= drag;
+            originForce += moveStep;
+            result.Add(originForce + (Vector2)rigidbody.transform.position);
+            steps++;
+        }
+        return result;
+    }
     //3D
     /// <summary>
     /// 將vec投影在XY軸上取得夾角
