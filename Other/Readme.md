@@ -1,5 +1,47 @@
 # Scripts info:
 
+## MyVectorExtension.cs
+
+### How to use Plot2D():
+
+Example : Get 2D Projectile plots (Like Angry bird).
+
+  ```  
+  int stepCount;
+  Vector3[] plotsResult=new Vector3[stepCount];
+  
+  //On Hold Mouse:
+  Vector2 dragDir = -(_cam.ScreenToWorldPoint(Input.mousePosition) - dragStart.position);
+  dragDir = MyVectorExtension.ClampedAngle(dragDir, Vector2.right, 60);  //Clamp shoot angle or you can skip this part.
+  projectialVec = dragDir.normalized * shootSpeed * Mathf.Abs(dragDir.x);
+
+  MyVectorExtension.Plot2D(ball, ball.velocity, projectialVec, -10f, ref plotsResult, out stepCount);
+  lineRender.positionCount = stepCount;
+  lineRender.SetPositions(plotsResult);
+  
+  //Shoot:
+  ball.AddForce(projectialVec, ForceMode2D.Impulse);
+  //Or:
+  ball.velocity = projectialVec;
+  
+  ```
+  
+### How to Calculate Projectile in 3D:
+Example : Get 3D Projectile plots and Physic-based Projectile Velocity.
+![image](https://i.imgur.com/IDqb9pE.gif)
+
+  ``` 
+  //Assume Shoot Forward.
+  Vector3 targetPosition = transform.position + transform.forward * 10;
+  Vector3 velocity = MyVectorExtension.GetProjectileShootVelocity(targetPosition, Start.position , 60 );
+  Vector3[] plots = MyVectorExtension.ProjectilePlots(velocity, Start.position, 0.1f, -5, out steps);
+  
+  //Shoot:
+  rg.velocity = velocity;
+  
+  ``` 
+
+
 ## SaveAndLoad.cs
 
 ### How to use:
@@ -87,6 +129,8 @@ The script ScreenObjPicker is better to go with the script PickableObject which 
 <hr>
 
 # 腳本資訊:
+
+新的內容我懶的翻譯了φ(゜▽゜*)♪(x
 
 ## SaveAndLoad.cs
 
