@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE actor [
+  <!ENTITY dll_path "Dlls/netstandard2.0/">
+  <!ENTITY class_type "ActionDll.PlayerAction">
+  
+]>
+<?xml-model href="./ActorSchema.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<actor >
+    <name>Actor1</name>
+    <update_time>0.2</update_time>
+    <prefab>Actor1</prefab>    
+    <actions>
+        <action name="Setup" trigger_type='ONSTART'>            
+            <dll path="&dll_path;" name="ActionCollections" >
+                <func type="&class_type;" name="Setup" ></func>
+            </dll>            
+        </action>
+
+        <action name="idle" prority="0" interoperable ="true" trigger_type='UPDATE'>
+            <dll path="&dll_path;" name="ActionCollections">                
+
+                <func type="&class_type;" name="Idle" > 
+                    <para name="clip">Idle</para>
+                </func>
+                <!-- 
+                <func type="&class_type;" name="GroundCheck" />
+                -->
+            </dll>
+          
+        </action>
+
+        <action name="walk" prority="2" duration="0.1" interoperable ="true" trigger_type='INPUT' trigger_name='Move'>
+            
+            <dll path="&dll_path;" name="ActionCollections">
+                <func type="&class_type;" name="Move" >
+                    <para name="trig">0</para>
+                    <para name="speedX">10</para>
+                    <para name="clip">Walk</para>
+                </func>
+
+            </dll>
+        </action>
+
+        <action name="jump" prority="5" cd='0.25'  trigger_type='INPUT' trigger_name='Vertical'>
+            
+            <dll path="&dll_path;" name="ActionCollections">
+                <func type="&class_type;" name="Jump" >
+                    <para name="trig">0</para>
+                    <para name="speedY">8</para>
+                </func>
+
+            </dll>
+        </action>
+
+        <!-- 加深 Gravtiy 動感-->
+        <action name="fall_check" prority="4"  trigger_type='UPDATE' >            
+            <dll path="&dll_path;" name="ActionCollections">
+                <func type="&class_type;" name="GroundCheck" />
+                <func type="&class_type;" name="FallCheck" />               
+            </dll>
+        </action>
+
+
+        <action name="Attack" prority="10" interoperable='false' cd='0.2' duration='0.1' trigger_type='INPUT' trigger_name='Attack'>            
+            <dll path="&dll_path;" name="ActionCollections">
+                <func type="&class_type;" name="Attack" > 
+                    <para name="trig">0</para>
+                    <para name="clip">Attack</para>
+                    <para name="damage">10</para>
+                </func>
+            </dll>
+        </action>
+
+
+        <action name="OnTouchGround" prority="10"  duration='0.1' trigger_type='EVENT' trigger_name='OnTouchGround'>            
+            <dll path="&dll_path;" name="ActionCollections">
+                <func type="&class_type;" name="Idle" />
+            </dll>
+        </action>
+
+    </actions>
+</actor>

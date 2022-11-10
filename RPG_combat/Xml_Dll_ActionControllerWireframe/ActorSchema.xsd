@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <!-- Root -->
+    <xs:element name="actor" type="actor_type"/>
+
+    <!-- Class Declear [Actor] -->
+    <xs:complexType name="actor_type">
+        <xs:sequence>
+            <xs:element name="name"/>
+            <xs:element name="update_time"/>
+            <xs:element name="prefab" minOccurs="0"/>
+            <xs:element name="actions">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="action" type="action_type" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Class Declear [Action] -->
+    <xs:complexType name="action_type">
+        <xs:sequence>
+            <xs:element name="dll" type="dll_type" maxOccurs="unbounded"></xs:element>
+        </xs:sequence>
+
+        <xs:attribute name="name"/>
+        <xs:attribute name="trigger_type" type="trigger_type_type"/>
+        <xs:attribute name="trigger_name" use="optional"/>
+        <xs:attribute name="prority" type="xs:integer"/>
+        <xs:attribute name="interoperable" type="xs:boolean"/>
+        <xs:attribute name="cd" type="xs:float"/>
+        <xs:attribute name="duration" type="xs:float"/>
+
+    </xs:complexType>
+
+    <!-- Class Declear [trigger_type] -->
+    <xs:simpleType name="trigger_type_type">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="INPUT"/>
+            <xs:enumeration value="UPDATE"/>
+            <xs:enumeration value="GLOBAL_EVENT"/>
+            <xs:enumeration value="EVENT"/>
+            <xs:enumeration value="ONSTART"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- Class Declear [dll] -->
+    <xs:complexType name="dll_type">
+        <xs:sequence>
+            <xs:element name="func" type="func_type" maxOccurs="unbounded"/>
+        </xs:sequence>
+
+        <xs:attribute name="path" type="xs:anyURI" use="required"/>
+        <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+
+
+    <xs:complexType name="func_type">
+        <xs:sequence>
+            <xs:element name="para" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:string">
+                            <xs:attribute name="name" type="xs:string" use="optional"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+
+        <xs:attribute name="type" use="required"/>
+        <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+
+</xs:schema>
