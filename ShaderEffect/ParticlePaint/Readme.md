@@ -12,8 +12,22 @@ I was inspired by some cool tools on the asset store like [this](https://assetst
 ## How to use
 
 - Add `Paintable` and `GPUInstancer` component on your gameobject.
-- Create material from `Painting.shader`. (If you are using URP, use `URP_Paintable.shader`) and put to the `Instance Material` variable of GPUInstancer.
+- Create material from `Painting.shader`. (`URP_Paintable.shader` also work) and put to the `Instance Material` variable of GPUInstancer.
 - Create a particle system gameobject and add `SplashSystem` componenet.
+
+
+## SRP
+
+If you are not using URP, you can use `Painting.shader` and change the tag:
+```C
+Tags {
+    //"RenderPipeline" = "UniversalPipeline"
+    "RenderType" = "Transparent"
+    "RenderQueue" = "Transparent"
+}
+    //Tags { "LightMode" = "UniversalForward" }
+
+```
 
 Preview:
 
